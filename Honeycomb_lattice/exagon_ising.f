@@ -11,7 +11,7 @@ C===============================================================
       call ranstart
 
       open(1, file='init.txt',status='old')		!file coi parametri
-      open(2, file='dati/dati50.dat',status='unknown')	!file coi risultati
+      open(2, file='dati/dati20.dat',status='unknown')	!file coi risultati
 	
       read(1,*) misure           !numero di misure
       read(1,*) i_dec            !updating fra una misura e l'altra
@@ -75,7 +75,7 @@ C============================================================================
       	  endif
       	  
       	  if (n3(i) < 0) then           !risolvo problemi al bordo
-      	      n3(i) = nvol - n3(i)	
+      	      n3(i) = nvol + n3(i)	
       	  endif
       	  
       enddo
@@ -110,7 +110,7 @@ C============================================================================
 	
       include "parameter.f"
       
-      do j = 1, nvol				!ciclo su tutti i siti
+      do j = 0, nvol				!ciclo su tutti i siti
 		
           i = int(nvol*ran2())	                !scelta random di un sito
 		
@@ -142,9 +142,9 @@ C============================================================================
 	
       include "parameter.f"
       
-      mag = 0			!inzializzo la variabile
+      mag = 0			!inizializzo la variabile
       
-      do i = 0, nvol		!ciclo su tutto il retico
+      do i = 0, nvol		!ciclo su tutto il reticolo
       
           mag = mag + campo(i)  !e sommo ogni sito
 
@@ -160,7 +160,7 @@ C============================================================================
       include "parameter.f"
       
       ene=0					!inzializzo la variabile
-      do i = 1, nvol				!ciclo su tutti i siti
+      do i = 0, nvol				!ciclo su tutti i siti
 	
 	  i1 = n1(i)			        !calcolo dei primi vicini
 	  i2 = n2(i)
