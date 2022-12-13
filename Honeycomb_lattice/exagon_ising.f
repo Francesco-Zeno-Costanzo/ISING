@@ -65,22 +65,22 @@ C============================================================================
       	
       do i = 0, nvol
       
-          n1(i) = i + 1		!codizioni per ogni sito
+          n1(i) = i + 1		        !codizioni per ogni sito
       	  n2(i) = i - 1
       	  
-      	  if (modulo(i, 2) == 0) then
-      	      n3(i) = i + 2*nlatt - 1
+      	  if (modulo(i, 2) == 0) then   !condizioni che regolano
+      	      n3(i) = i + 2*nlatt - 1   !l'esagonalità del reticolo
       	  else
       	      n3(i) = i - 2*nlatt + 1
       	  endif
       	  
-      	  if (n3(i) < 0) then
-      	      n3(i) = nvol - n3(i)
+      	  if (n3(i) < 0) then           !risolvo problemi al bordo
+      	      n3(i) = nvol - n3(i)	
       	  endif
       	  
       enddo
       
-      n1(nvol - 1) = 0
+      n1(nvol - 1) = 0			!problemi agli estremi
       n2(0) = nvol - 1
       	
       return
