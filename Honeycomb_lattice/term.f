@@ -11,8 +11,8 @@
 	
       !apro file da cui leggere i dati da analizzare e file su
       !cui scrivere i risultati con relativi errori
-      open(unit=0, file="dati/dati15.dat", status="old", action="read")
-      open(unit=2, file='datiplot/dati15.dat',status='unknown')
+      open(unit=0, file="dati/dati50.dat", status="old", action="read")
+      open(unit=2, file='datiplot/dati50.dat',status='unknown')
 	
       R = 100				!numero di ricampionamenti
       
@@ -84,7 +84,7 @@ C=============================================================================
       !da inserire nella simulazione, e per non sprecare tempo macchina,
       !bisogna tenere conto di una possibile correlazione frai i dati
 	
-      Dd = 1e4			!dimensione dei blocchi	
+      Dd = 1e3			!dimensione dei blocchi	
       nb = N/Dd			!numero dei blocchi
       do l = 1, R		!ciclo sui ricampionamenti
           do i = 1, nb

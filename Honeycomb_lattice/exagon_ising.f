@@ -11,7 +11,7 @@ C===============================================================
       call ranstart
 
       open(1, file='init.txt',status='old')		!file coi parametri
-      open(2, file='dati/dati15.dat',status='unknown')	!file coi risultati
+      open(2, file='dati/dati50.dat',status='unknown')	!file coi risultati
 	
       read(1,*) misure           !numero di misure
       read(1,*) i_dec            !updating fra una misura e l'altra
@@ -144,7 +144,7 @@ C============================================================================
       
       mag = 0			!inzializzo la variabile
       
-      do i = 0, nlatt		!ciclo su tutto il retico
+      do i = 0, nvol		!ciclo su tutto il retico
       
           mag = mag + campo(i)  !e sommo ogni sito
 

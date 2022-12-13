@@ -38,20 +38,20 @@ def plotbinder(B, args, d_args, L, k, title, xlabel, ylabel):
     main_ax.set_ylabel(ylabel, fontsize=15)
     main_ax.grid()
     
-    #right_inset_ax = fig.add_axes([.55, .5, .3, .3])
-    #right_inset_ax.grid()
-    #right_inset_ax.set_xlim(0.436, 0.444)
-    #right_inset_ax.set_ylim(1.05, 1.25)
+    right_inset_ax = fig.add_axes([.55, .5, .3, .3])
+    right_inset_ax.grid()
+    right_inset_ax.set_xlim(0.63, 0.69)
+    right_inset_ax.set_ylim(0.99, 1.8)
     
     colors = plt.cm.jet(np.linspace(0, 1, len(args)))
     
     for p, dp, i in zip(args, d_args, range(len(args))):
 
         main_ax.errorbar(B, p, dp, fmt='.', color=colors[i], label=f'L={L[i]}')
-        #right_inset_ax.errorbar(B, p, dp, fmt='.', linestyle='--', color=colors[i], label=f'L={L[i]}')
+        right_inset_ax.errorbar(B, p, dp, fmt='.', linestyle='--', color=colors[i], label=f'L={L[i]}')
         
     main_ax.legend(loc='best')
-    #right_inset_ax.legend(loc='best')
+    right_inset_ax.legend(loc='best')
     
 
 def FSS(B, q1, q2, bc, args, d_args, L, k, title, xlabel, ylabel):
@@ -78,7 +78,7 @@ def fit(F, x, y, dy, init, k, Title, xlabel, ylabel, plot=True):
     della figura ceh può non essere visualizzata se
     plot assume valore False, di default è True
     '''
-    pars, covm = curve_fit(F, x, y, init, sigma=dy)
+    pars, covm = curve_fit(F, x, y, init, sigma=dy, maxfev=10000)
     err = np.sqrt(covm.diagonal())
     for p, dp, i in zip(pars, err, range(len(pars))):
         print(f"pars{i} = {p:.5f} +- {dp:.5f}")

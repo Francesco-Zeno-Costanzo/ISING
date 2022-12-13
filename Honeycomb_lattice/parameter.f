@@ -1,5 +1,5 @@
 
-      parameter (nlatt=15, nvol=2*nlatt**2)
+      parameter (nlatt=50, nvol=2*nlatt**2)
       
       integer campo
       !indicizzati da zero per comodità
