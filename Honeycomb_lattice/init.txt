@@ -1,0 +1,15 @@
+100000	
+10
+0
+0.4
+0.9
+100
+1
+
+numero di misure
+updating fra una misura e l'altra
+valore del campo esterno
+temperatura inversa minima
+temperatura inversa missima
+numero di temperature
+costante di accoppiamento
