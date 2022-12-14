@@ -7,6 +7,8 @@ C simulazione facendolo una sola volta piuttosto che diverse
 C volte all'interno del codice 
 C===============================================================
 
+
+c	ciao
       call cpu_time(start)
       call ranstart
 
