@@ -1,7 +1,6 @@
       program honeycomb_ising
 	  
       include "parameter.f"
-      
 C===============================================================
 C file che permette di cambiare più facilmente i parametri della
 C simulazione facendolo una sola volta piuttosto che diverse
@@ -15,7 +14,7 @@ C===============================================================
       call ranstart
 
       open(1, file='init.txt',status='old')		      !file coi parametri
-      open(2, file='dati/dati30.dat',status='unknown')	!file coi risultati
+      open(2, file='dati/dati20.dat',status='unknown')	!file coi risultati
 	
       read(1,*) misure           !numero di misure
       read(1,*) i_dec            !updating fra una misura e l'altra
@@ -57,7 +56,7 @@ C===============================================================
           enddo
 
           !Sezione di caricamento, scrivo percentuale
-          write(*,'(I2, a2)', advance='NO') int(k/float(npassi)*100), " %"
+          write(*,'(f8.1, a2)', advance='NO') k/float(npassi)*100, " %"
           flush(6) !pulisco la riga
 
       enddo
@@ -125,6 +124,7 @@ C============================================================================
 
 
 C============================================================================
+C Subroutine che implementa il metropolis
 C============================================================================
 
       
