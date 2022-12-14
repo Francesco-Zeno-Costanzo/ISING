@@ -1,34 +1,36 @@
       program honeycomb_ising
 	  
       include "parameter.f"
-      character :: cr
-      cr = char(13)
+      
 C===============================================================
 C file che permette di cambiare più facilmente i parametri della
 C simulazione facendolo una sola volta piuttosto che diverse
 C volte all'interno del codice 
 C===============================================================
+      
+      character :: cr  !variaboile per il caricamento
+      cr = char(13)    !serve per sovrascivere sulla shell
 
       call cpu_time(start)
       call ranstart
 
-      open(1, file='init.txt',status='old')		!file coi parametri
+      open(1, file='init.txt',status='old')		      !file coi parametri
       open(2, file='dati/dati30.dat',status='unknown')	!file coi risultati
 	
       read(1,*) misure           !numero di misure
       read(1,*) i_dec            !updating fra una misura e l'altra
-      read(1,*) bext      	 !valore del campo esterno
-      read(1,*) bmin 		 !temperatura inversa minima
-      read(1,*) bmax		 !temperatura inversa missima
+      read(1,*) bext      	   !valore del campo esterno
+      read(1,*) bmin 		   !temperatura inversa minima
+      read(1,*) bmax		   !temperatura inversa missima
       read(1,*) npassi	         !numero di temperature
       read(1,*) J_acc            !costante di accoppiamento
        
-      write(2, *) misure	 !scrivo quantità che seriviranno
+      write(2, *) misure	   !scrivo quantità che seriviranno
       write(2, *) nvol	         !nell'analisi
       write(2, *) npassi
      
-      call bordi()		 !condizioni di bordo continuo
-      call init()		 !inizializzo la matrice
+      call bordi()		   !condizioni di bordo continuo
+      call init()		         !inizializzo la matrice
 	
       !la scrittura avviene su un unico file che poi verra letto a blocchi
       !ogni blocco corrisponde ad una temperatura diversa
@@ -39,24 +41,25 @@ C===============================================================
       do k = 1, npassi		 !ciclo sulle temperature
 	
           beta = bmin + (k-1)*(bmax-bmin)/float(npassi-1)
-          write(*, '(A1)', advance='no')  cr
+          write(*, '(A1)', advance='no')  cr !scrivo cr necessario per pulire la shell
 		
-	  do i = 1, misure 	!ciclo sulle misure a fissa temperatura
+          do i = 1, misure 	               !ciclo sulle misure a fissa temperatura
 
-            do j = 1, i_dec
-			call metropolis(beta)   !decorrela la matrice
-	      enddo
-			
-	      call magnetizzazione(mag)	!misurazione delle osservabili
-	      call energia(ene)
-	      
-	      write(2,*) abs(mag), ene	!salvataggio risultati
-	  
-	  enddo
-	  
-	  !Sezione di caricamento
-	  write(*,'(I2, a2)', advance='NO') int(k/float(npassi)*100), " %"
-	  flush(6)
+              do j = 1, i_dec
+                  call metropolis(beta)      !decorrela la matrice  
+              enddo
+
+              call magnetizzazione(mag)	   !misurazione delle osservabili
+              call energia(ene)
+
+              write(2,*) abs(mag), ene	   !salvataggio risultati
+
+          enddo
+
+          !Sezione di caricamento, scrivo percentuale
+          write(*,'(I2, a2)', advance='NO') int(k/float(npassi)*100), " %"
+          flush(6) !pulisco la riga
+
       enddo
 	
       call ranfinish
@@ -66,94 +69,108 @@ C===============================================================
 	
       end program honeycomb_ising
 
+
+C============================================================================
+C Subroutine per condizioni al bordo per reticolo esagonale
 C============================================================================
 
+      
       subroutine bordi() 		
 	   
       include "parameter.f"
       	
-      do i = 0, nvol
+      do i = 1, nvol
       
-          n1(i) = i + 1		        !codizioni per ogni sito
-      	  n2(i) = i - 1
+          n1(i) = i + 1		                    !codizioni per ogni sito
+          n2(i) = i - 1
       	  
-      	  if (modulo(i, 2) == 0) then   !condizioni che regolano
-      	      n3(i) = i + 2*nlatt - 1   !l'esagonalità del reticolo
-      	  else
-      	      n3(i) = i - 2*nlatt + 1
-      	  endif
+          if (modulo(i, 2) == 0) then             !condizioni che regolano
+      	  n3(i) = i - 2*nlatt + 1             !l'esagonalità del reticolo
+          else
+      	  n3(i) = i + 2*nlatt - 1
+          endif
       	  
-      	  if (n3(i) < 0) then           !risolvo problemi al bordo
-      	      n3(i) = nvol + n3(i)	
-      	  endif
+          if ((n3(i) < 0).or.(n3(i)>nvol)) then   !condizioni, periodico-elicoidali
+              n3(i) = modulo(n3(i), nvol)	
+          endif
       	  
       enddo
       
-      n1(nvol - 1) = 0			!problemi agli estremi
-      n2(0) = nvol - 1
+      n1(nvol) = 1			              !problemi agli estremi
+      n2(1) = nvol
       	
       return
       end
  
+ 
+C============================================================================
+C Inizializzazione del reticolo a caldo
 C============================================================================
       	
       subroutine init()
       	
       include "parameter.f"
       	
-      do i = 0, nvol
-          x=ran2()
-      	  if(x<0.5) then
-      	      campo(i) = 1
-      	  else
-      	      campo(i) = -1
-      	  endif
+      do i = 1, nvol
+          x = ran2()
+          if(x<0.5) then
+              campo(i) = 1
+          else
+              campo(i) = -1
+          endif
       enddo
     
       return
       end
 
+
+C============================================================================
 C============================================================================
 
+      
       subroutine metropolis(beta)
 	
       include "parameter.f"
       
-      do j = 0, nvol				!ciclo su tutti i siti
+      do j = 1, nvol				      !ciclo su tutti i siti
 		
-        i = int(nvol*ran2())	                !scelta random di un sito
+          i = int(nvol*ran2()+1)	            !scelta random di un sito
 		
-	  i1 = n1(i)			        !calcolo dei primi vicini
-	  i2 = n2(i)
-	  i3 = n3(i)
-		
-	  F = campo(i1) + campo(i2) + campo(i3) !sommo i primi vicini
-     	  F = beta*(F + bext)		        !aggiungo eventuale campo esterno
+          i1 = n1(i)			            !calcolo dei primi vicini
+          i2 = n2(i)
+          i3 = n3(i)
+
+          F = campo(i1) + campo(i2) + campo(i3) !sommo i primi vicini
+          F = beta*(F + bext)		            !aggiungo eventuale campo esterno
      		
-     	  ispin = campo(i)
+          ispin = campo(i)
      		
-     	  p =  exp(-2.0*J_acc*ispin*F)		!probabilità di accettare la mossa
+          p =  exp(-2.0*J_acc*ispin*F)		!probabilità di accettare la mossa
      		
-     	  x = ran2()			        !numero casuale per il test
+          x = ran2()			            !numero casuale per il test
      		
-     	  if(x < p) then			!test di accettanza
-     	      campo(i) = -ispin	                !se F è negativo il test è
-     	  endif				        !passato di default
+          if(x < p) then			      !test di accettanza
+              campo(i) = -ispin	            !se F è negativo il test è
+     	    endif				            !passato di default
 	
       enddo
+      
       return
       end
 	
 
 C============================================================================
+C Subroutine misura della magnetizzazione
+C============================================================================
+
 
       subroutine magnetizzazione(mag)
 	
       include "parameter.f"
       
-      mag = 0			!ini	zializzo la variabile
+      mag = 0			  !ini	zializzo la variabile
       
-      do i = 0, nvol		!ciclo su tutto il reticolo
+      do i = 1, nvol		  !ciclo su tutto il reticolo
       
           mag = mag + campo(i)  !e sommo ogni sito
 
@@ -162,31 +179,32 @@ C============================================================================
       return
       end
 
+
+C============================================================================
+C Subroutine misura dell'energia
 C============================================================================
 
+      
       subroutine energia(ene)
 	
       include "parameter.f"
       
-      ene=0					!inzializzo la variabile
-      do i = 0, nvol				!ciclo su tutti i siti
-	
-	  i1 = n1(i)			        !calcolo dei primi vicini
-	  i2 = n2(i)
-	  i3 = n3(i)
+      ene = 0					      !inzializzo la variabile
+      do i = 1, nvol				      !ciclo su tutti i siti
+
+          i1 = n1(i)			            !calcolo dei primi vicini
+          i2 = n2(i)
+          i3 = n3(i)
 		
-	  F = campo(i1) + campo(i2) + campo(i3) !sommo i primi vicini
+          F = campo(i1) + campo(i2) + campo(i3) !sommo i primi vicini
  
-     	  ene = ene - 0.5*J_acc*F*campo(i)	        !0.5 per non sovracontare
-          ene = ene - bext*campo(i)      	!eventuale campo esterno
+          ene = ene - 0.5*J_acc*F*campo(i)	!0.5 per non sovracontare
+          ene = ene - bext*campo(i)      	      !eventuale campo esterno
 
       enddo
-	
+
       return
       end
-
-
-C============================================================================
 
 
 c============================================================================
