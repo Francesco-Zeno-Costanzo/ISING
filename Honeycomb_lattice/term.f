@@ -11,8 +11,8 @@
 	
       !apro file da cui leggere i dati da analizzare e file su
       !cui scrivere i risultati con relativi errori
-      open(unit=0, file="dati/dati50.dat", status="old", action="read")
-      open(unit=2, file='datiplot/dati50.dat',status='unknown')
+      open(unit=0, file="dati/dati40.dat", status="old", action="read")
+      open(unit=2, file='datiplot/dati40.dat',status='unknown')
 	
       R = 100				!numero di ricampionamenti
       
@@ -22,30 +22,30 @@
 	
       allocate(Ene(N), Mag(N))
 
-      do j=1, npassi			!leggo a blocchi il file
+      do j=1, npassi			  !leggo a blocchi il file
           do i = 1, N		        !ogni blocco una temperatura diversa
-	      read(0, *) Mag(i), Ene(i)
-	  enddo
+	        read(0, *) Mag(i), Ene(i)
+	    enddo
 	  
-	  aver_e = sum(Ene)/float(N*nvol) 	        !Energia media
-	  aver_m = sum(Mag)/float(N*nvol)		!magnetizzazione media
+	    aver_e = sum(Ene)/float(N*nvol) 	!Energia media
+	    aver_m = sum(Mag)/float(N*nvol)		!magnetizzazione media
 		
-	  c = (sum(Ene**2)/float(N) - (sum(Ene)/float(N))**2)
-	  x = (sum(Mag**2)/float(N) - (sum(Mag)/float(N))**2)
+	    c = (sum(Ene**2)/float(N) - (sum(Ene)/float(N))**2)
+	    x = (sum(Mag**2)/float(N) - (sum(Mag)/float(N))**2)
 		
-	  aver_c = c/float(nvol)			!calore specifico medio
-	  aver_x = x/float(nvol)			!suscettività media
+	    aver_c = c/float(nvol)			!calore specifico medio
+	    aver_x = x/float(nvol)			!suscettività media
 		
-	  cb = (sum(Mag**4)/(sum(Mag**2)**2))*N
+	    cb = (sum(Mag**4)/(sum(Mag**2)**2))*N !cumulante di binder
 
-	  !calcolo errore con bootstrap, se l'ultimo parametro è 1
-	  !viene calcolato anche l'errore sul cumulate di binder
+	    !calcolo errore con bootstrap, se l'ultimo parametro è 1
+	    !viene calcolato anche l'errore sul cumulate di binder
 		
-   	  call errore(Ene, daver_e, daver_c, dcb, 0)
-   	  call errore(Mag, daver_m, daver_x, dcb, 1)
+   	    call errore(Ene, daver_e, daver_c, dcb, 0)
+   	    call errore(Mag, daver_m, daver_x, dcb, 1)
 
-    	  write(2,*) aver_e, aver_m, aver_c, aver_x, cb,	!salvo su file
-     &	             daver_e, daver_m, daver_c, daver_x, dcb
+    	    write(2,*) aver_e, aver_m, aver_c, aver_x, cb,	!salvo su file
+     &	         daver_e, daver_m, daver_c, daver_x, dcb
 		
       enddo
 	
@@ -55,8 +55,12 @@
       print '("tempo di esecuzione= ", f8.4," secondi.")', finish-start
 
       end program analisi
+
 	
 C=============================================================================
+C Subroutine per il calcolo degli errori tramite binned bootstrap
+C=============================================================================
+
 
       subroutine errore(x, dx, dx1, db, B)
       common N, R, nvol
@@ -76,33 +80,33 @@ C=============================================================================
 
       allocate(z(N), u(R), a(R))
       if(B==1) then
-	  allocate(q(R))
+	    allocate(q(R))
       endif
 	
       !il calcolo dell'errore avviene tramite il binned bootstrap poichè
       !a priori non si può sapere qual è il tempo di decorellazione migliore
       !da inserire nella simulazione, e per non sprecare tempo macchina,
-      !bisogna tenere conto di una possibile correlazione frai i dati
+      !bisogna tenere conto di una possibile correlazione fra i dati
 	
       Dd = 1e3			!dimensione dei blocchi	
       nb = N/Dd			!numero dei blocchi
-      do l = 1, R		!ciclo sui ricampionamenti
+      do l = 1, R		      !ciclo sui ricampionamenti
           do i = 1, nb
 		
-	      j = int(ran2()*N +1) !scelgo sito a caso
-	      do g= 1, Dd		 	
-	          z((i-1)*Dd+g) = x(mod(j+g-2,N)+1) !ricampiono a blocchi	
-	      enddo
+	        j = int(ran2()*N +1) !scelgo sito a caso
+	        do g= 1, Dd		 	
+	            z((i-1)*Dd+g) = x(mod(j+g-2,N)+1) !ricampiono a blocchi	
+	        enddo
 			
-	  enddo
+	    enddo
 		
-	  !calcolo della media e della varianza dei ricampionamenti
+	    !calcolo della media e della varianza dei ricampionamenti
 		
-	  a(l) = sum(z)/float(N*nvol)
-	  u(l) = (sum(z**2)/float(N) - (sum(z)/float(N))**2)/float(nvol)	
-	  if(B==1) then
-	      q(l) = (sum(z**4)/(sum(z**2)**2))*N
-	  endif	
+	    a(l) = sum(z)/float(N*nvol)
+	    u(l) = (sum(z**2)/float(N) - (sum(z)/float(N))**2)/float(nvol)	
+	    if(B==1) then
+	        q(l) = (sum(z**4)/(sum(z**2)**2))*N
+	    endif	
       enddo
 	
       media_dx = sum(u)/float(R)		!calcolo la media degli estimatori
@@ -114,22 +118,24 @@ C=============================================================================
 	
       do i=1, R
           dx1 = dx1 + (u(i) - media_dx)**2 !calcolo scarto quadratico
-	  dx  = dx  + (a(i) - media_x )**2
-	  if(B==1) then
-	      db = db + (q(i) - media_b)**2
-	  endif
+	    dx  = dx  + (a(i) - media_x )**2
+	    if(B==1) then
+	        db = db + (q(i) - media_b)**2
+	    endif
       enddo
 	
       dx  = sqrt(dx/float(R - 1))		!prendo l'errore sul campione
       dx1 = sqrt(dx1/float(R - 1))		!perchè  sono stai effettuati
       if(B==1) then				!R ricampionamenti
-	  db = sqrt(db/float(R - 1))	        !quindi divido solo per R-1
-      endif					!e non R(R-1)
+	    db = sqrt(db/float(R - 1))	!quindi divido solo per R-1
+      endif					      !e non R(R-1)
 	
       return
       end
-	
-C=============================================================================
+c============================================================================
+c  RANDOM NUMBER GENERATOR: standard ran2 from numerical recipes
+c============================================================================
+
       function ran2()
       implicit real*4 (a-h,o-z)
       implicit integer*4 (i-n)

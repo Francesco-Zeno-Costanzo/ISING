@@ -8,16 +8,16 @@ E10, M10, C10, X10, cb10, dE10, dM10, dC10, dX10, dcb10 = np.loadtxt(r'datiplot/
 E20, M20, C20, X20, cb20, dE20, dM20, dC20, dX20, dcb20 = np.loadtxt(r'datiplot/dati20.dat', unpack=True)
 E30, M30, C30, X30, cb30, dE30, dM30, dC30, dX30, dcb30 = np.loadtxt(r'datiplot/dati30.dat', unpack=True)
 E40, M40, C40, X40, cb40, dE40, dM40, dC40, dX40, dcb40 = np.loadtxt(r'datiplot/dati40.dat', unpack=True)
-E50, M50, C50, X50, cb50, dE50, dM50, dC50, dX50, dcb50 = np.loadtxt(r'datiplot/dati50.dat', unpack=True)
+#E50, M50, C50, X50, cb50, dE50, dM50, dC50, dX50, dcb50 = np.loadtxt(r'datiplot/dati50.dat', unpack=True)
 
-ret = [10, 20, 30, 40, 50]
+ret = [10, 20, 30, 40]#, 50]
 H = 0
 
 
 ##Alcuni plot a titolo espositivo
 
 #calcolo array temperature
-par = np.loadtxt(r'init.txt', unpack=True)
+par = np.loadtxt(r'init.txt', max_rows=6, unpack=True)
 bmin, bmax, npassi = par[3:6]
 
 npassi = int(npassi)
@@ -28,28 +28,28 @@ for i in range(1, npassi+1):
 
 Title = f'Simulazione del modello di Ising 2D tramite Metropolis \n Campo magnetico esterno B={H}'
 xlabel = r'$\beta$ [u.a.]'   
-grafici.plot(B, [E10, E20, E30, E40, E50], 
-                [dE10, dE20, dE30, dE40, dE50],
+grafici.plot(B, [E10, E20, E30, E40],#, E50], 
+                [dE10, dE20, dE30, dE40],#, dE50],
                 ret, 1, Title, xlabel, "Energia [u.a.]")
                 
-grafici.plot(B, [M10, M20, M30, M40, M50],
-                [dM10, dM20, dM30, dM40, dM50],
+grafici.plot(B, [M10, M20, M30, M40],#, M50],
+                [dM10, dM20, dM30, dM40],#, dM50],
                 ret, 2, Title, xlabel, "Magetizzazione [u.a.]")
                 
-grafici.plot(B, [C10, C20, C30, C40, C50], 
-                [dC10, dC20, dC30, dC40, dC50],
+grafici.plot(B, [C10, C20, C30, C40],#, C50], 
+                [dC10, dC20, dC30, dC40],#, dC50],
                 ret, 3, Title, xlabel, "Calore specifico [u.a.]")
                  
-grafici.plot(B, [X10, X20, X30, X40, X50], 
-                [dX10, dX20, dX30, dX40, dX50], 
+grafici.plot(B, [X10, X20, X30, X40],#, X50], 
+                [dX10, dX20, dX30, dX40],#, dX50], 
                 ret, 4, Title, xlabel, "Suscettività [u.a.]") 
  
-grafici.plotbinder(B, [cb10, cb20, cb30, cb40, cb50], 
-                      [dcb10, dcb20, dcb30, dcb40, dcb50],
+grafici.plotbinder(B, [cb10, cb20, cb30, cb40],#, cb50], 
+                      [dcb10, dcb20, dcb30, dcb40],#, dcb50],
                       ret, 5, Title, xlabel, "Cumulante di binder") 
-
+"""
 #valore di beta ricavato
-bc = 0.665
+bc = 0.661
 dbc = 0.001
 print(f"beta critico = {bc:.3f} +- {dbc:.3f}")
 
@@ -89,8 +89,8 @@ def MS(*arg):
 			
     return l, dl
 	
-MX, dMX = MS(X10, X20, X30, X40, X50, dX10, dX20, dX30, dX40, dX50)
-N = np.arange(10, 51, 10)
+MX, dMX = MS(X10, X20, X30, X40, dX10, dX20, dX30, dX40)
+N = np.arange(10, 41, 10)
 Title = 'Massimo della suscettività al variare di L'
 ylabel = r'$\chi_{max} [a.u.]$'
 xlabel = r'L [a.u.]'
@@ -105,9 +105,9 @@ print('stima di gamma')
 
 
 #seleziono solo un range dei dati
-x = B[33:]-bc
-y = X50[33:]
-dy = dX50[33:]
+x = B[54:77]-bc
+y = X40[54:77]
+dy = dX40[54:77]
 #valori che mi aspetto per i parametri ottimali
 init = np.array([0.00352, -7/4, -0.013]) #aiutano la convergenza del fit
 
@@ -121,9 +121,9 @@ print('\n')
 print('stima di beta')
 
 #seleziono solo un range dei dati
-x = B[31:38] - bc
-y = M50[31:38]
-dy = dM50[31:38]
+x = B[52:72] - bc
+y = M40[52:72]
+dy = dM40[52:72]
 
 #valori che mi aspetto per i parametri ottimali
 init = np.array([0.93, 1/8, 0.64]) #aiutano la convergenza del fit
@@ -143,8 +143,8 @@ def Fa(x, m, g):
     '''
     return m*x**g 
     
-CM, dCM = MS(C10, C20, C30, C40, C50, dC10, dC20, dC30, dC40, dC50)
-N = np.arange(10, 51, 10)
+CM, dCM = MS(C10, C20, C30, C40, dC10, dC20, dC30, dC40)
+N = np.arange(10, 41, 10)
 
 
 #valori che mi aspetto per i parametri ottimali
@@ -190,17 +190,17 @@ xlabel = r'$(\beta-\beta_c)L^{1/ \nu}$'
 ylabel = r'$|M|/L^{-b/ \nu}$'
     
 grafici.FSS(B, 1/n, -b/n, bc, 
-            [M20, M30, M40, M50],
-            [dM20, dM30, dM40, dM50], 
-            [20, 30, 40, 50], 10, Title, xlabel, ylabel)
+            [M10, M20, M30, M40],#, M50],
+            [dM10, dM20, dM30, dM40],#, dM50], 
+            ret, 10, Title, xlabel, ylabel)
 
 Title = 'Finite size scaling della suscettività'
 xlabel = r'$(\beta-\beta_c)L^{1/ \nu}$'
 ylabel = r'$ \chi /L^{\gamma/ \nu}$'
 
 grafici.FSS(B, 1/n, g/n, bc, 
-            [X20, X30, X40, X50],
-            [dX20, dX30, dX40, dX50],
-            [20, 30, 40, 50], 11, Title, xlabel, ylabel) 
-
+            [X10, X20, X30, X40],#, X50],
+            [dX10, dX20, dX30, dX40],#, dX50],
+            ret, 11, Title, xlabel, ylabel) 
+"""
 plt.show()

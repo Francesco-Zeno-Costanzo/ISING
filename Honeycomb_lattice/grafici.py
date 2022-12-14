@@ -40,8 +40,8 @@ def plotbinder(B, args, d_args, L, k, title, xlabel, ylabel):
     
     right_inset_ax = fig.add_axes([.55, .5, .3, .3])
     right_inset_ax.grid()
-    right_inset_ax.set_xlim(0.63, 0.69)
-    right_inset_ax.set_ylim(0.99, 1.8)
+    right_inset_ax.set_xlim(0.645, 0.675)
+    right_inset_ax.set_ylim(0.99, 1.4)
     
     colors = plt.cm.jet(np.linspace(0, 1, len(args)))
     
@@ -78,7 +78,7 @@ def fit(F, x, y, dy, init, k, Title, xlabel, ylabel, plot=True):
     della figura ceh può non essere visualizzata se
     plot assume valore False, di default è True
     '''
-    pars, covm = curve_fit(F, x, y, init, sigma=dy, maxfev=10000)
+    pars, covm = curve_fit(F, x, y, init, sigma=dy)
     err = np.sqrt(covm.diagonal())
     for p, dp, i in zip(pars, err, range(len(pars))):
         print(f"pars{i} = {p:.5f} +- {dp:.5f}")

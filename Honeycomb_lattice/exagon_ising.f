@@ -14,7 +14,7 @@ C===============================================================
       call ranstart
 
       open(1, file='init.txt',status='old')		      !file coi parametri
-      open(2, file='dati/dati20.dat',status='unknown')	!file coi risultati
+      open(2, file='dati/dati40.dat',status='unknown')	!file coi risultati
 	
       read(1,*) misure           !numero di misure
       read(1,*) i_dec            !updating fra una misura e l'altra
@@ -64,7 +64,15 @@ C===============================================================
       call ranfinish
 	
       call cpu_time(finish)
-      print '("tempo di esecuzione= ", f16.8," secondi.")', finish-start
+      
+      elapsed = finish - start            !elapsed time in secodni
+      i_h = elapsed/3600                  !ore trascorse
+      i_m = modulo(elapsed/60, 60)        !minuti trascorsi
+      i_s = modulo(int(elapsed), 60)      !secondi trascorsi
+      
+      write(*,*)
+      print*, 'Tempo di esecuzione :'
+      print '(I3," ore ", I3," min", I3, " sec ")', i_h, i_m, i_s
 	
       end program honeycomb_ising
 
@@ -83,15 +91,15 @@ C============================================================================
           n1(i) = i + 1		                    !codizioni per ogni sito
           n2(i) = i - 1
       	  
-          if (modulo(i, 2) == 0) then             !condizioni che regolano
-      	  n3(i) = i - 2*nlatt + 1             !l'esagonalità del reticolo
-          else
-      	  n3(i) = i + 2*nlatt - 1
-          endif
+          if (modulo(i, 2) == 0) then             !Condizioni che regolano
+      	  n3(i) = i - 2*nlatt + 1             !l'esagonalità del reticolo.
+          else                                    !Il reticolo è un array ma le
+      	  n3(i) = i + 2*nlatt - 1             !interazioni con questi vicini
+          endif                                   !lo mappano in un reticolo esagonale
       	  
           if ((n3(i) < 0).or.(n3(i)>nvol)) then   !condizioni, periodico-elicoidali
-              n3(i) = modulo(n3(i), nvol)	
-          endif
+              n3(i) = modulo(n3(i), nvol)	        !sopra e sotto identificati, mentre
+          endif                                   !la riga i-esima si attacca alla i+1 -esima
       	  
       enddo
       
@@ -110,9 +118,9 @@ C============================================================================
       	
       include "parameter.f"
       	
-      do i = 1, nvol
-          x = ran2()
-          if(x<0.5) then
+      do i = 1, nvol           !iniazzializzazione del reticolo
+          x = ran2()           !idealmente corrispone ad avere T infinita
+          if(x<0.5) then       !perchè il varole +-1 del sito è causale
               campo(i) = 1
           else
               campo(i) = -1
@@ -168,7 +176,7 @@ C============================================================================
 	
       include "parameter.f"
       
-      mag = 0			  !ini	zializzo la variabile
+      mag = 0			  !inizializzo la variabile
       
       do i = 1, nvol		  !ciclo su tutto il reticolo
       
@@ -190,6 +198,7 @@ C============================================================================
       include "parameter.f"
       
       ene = 0					      !inzializzo la variabile
+      
       do i = 1, nvol				      !ciclo su tutti i siti
 
           i1 = n1(i)			            !calcolo dei primi vicini
