@@ -1,10 +1,10 @@
 
-      parameter (nlatt=40, nvol=2*nlatt**2)
+      parameter (nlatt=50, nvol=2*nlatt**2)
       
       integer campo
-      !indicizzati da zero per comodità
-      common/reticolo/campo(0:nvol)
-      common/vicini/n1(0:nvol),n2(0:nvol),n3(0:nvol)
+      
+      common/reticolo/campo(nvol)
+      common/vicini/n1(nvol),n2(nvol),n3(nvol)
       
       common/vario/bext,J_acc
       
