@@ -40,11 +40,12 @@ for i in range(1, npassi+1):
     B[i-1] = bmin + (i-1)*(bmax - bmin)/(npassi-1)
 
 Title = f'Simulazione del modello di Ising 2D tramite Metropolis \n Campo magnetico esterno B={H}'
-xlabel = r'$\beta$ [u.a.]'   
+xlabel = r'$\beta$ [u.a.]' 
+"""  
 grafici.plot(B, E, dE, ret, 1, Title, xlabel, "Energia [u.a.]")
-                
+"""
 grafici.plot(B, M, dM, ret, 2, Title, xlabel, "Magetizzazione [u.a.]")
-                
+"""      
 grafici.plot(B, C, dC, ret, 3, Title, xlabel, "Calore specifico [u.a.]")
                  
 grafici.plot(B, X, dX, ret, 4, Title, xlabel, "Suscettività [u.a.]") 
@@ -57,12 +58,13 @@ dbc = 0.001
 print(f"beta critico = {bc:.3f} +- {dbc:.3f}")
 
 def F(x, m, g, q):
-    '''funzione modello per i fit successivi
+    '''
+    funzione modello per i fit successivi
     '''
     return m*x**g + q
 
 ##stima di gamma/nu
-
+"""
 print('\n')
 
 print('stima di gamma/nu')
@@ -92,13 +94,15 @@ def MS(*arg):
 			
     return l, dl
 	
-MX, dMX = MS(X10, X20, X30, X40, dX10, dX20, dX30, dX40)
-N = np.arange(10, 41, 10)
+MX, dMX = MS(X10, X20, X30, X40, X50, dX10, dX20, dX30, dX40, dX50)
+N = np.arange(10, 51, 10)
 Title = 'Massimo della suscettività al variare di L'
 ylabel = r'$\chi_{max} [a.u.]$'
 xlabel = r'L [a.u.]'
 init = np.array([1, 1, 1])
-  
+ 
+#prendere più punti
+
 pars, dpars = grafici.fit(F, N, MX, dMX, init, 6, Title, xlabel, ylabel)
 
 ##stima di gamma
@@ -108,9 +112,11 @@ print('stima di gamma')
 
 
 #seleziono solo un range dei dati
-x = B[54:77]-bc
-y = X40[54:77]
-dy = dX40[54:77]
+indx1 = 57
+indx2 = 87
+x = B[indx1:indx2]-bc
+y = X50[indx1:indx2]
+dy = dX50[indx1:indx2]
 #valori che mi aspetto per i parametri ottimali
 init = np.array([0.00352, -7/4, -0.013]) #aiutano la convergenza del fit
 
@@ -124,9 +130,11 @@ print('\n')
 print('stima di beta')
 
 #seleziono solo un range dei dati
-x = B[52:72] - bc
-y = M40[52:72]
-dy = dM40[52:72]
+indx1 = 50
+indx2 = 70
+x = B[indx1:indx2]-bc
+y = M50[indx1:indx2]
+dy = dM50[indx1:indx2]
 
 #valori che mi aspetto per i parametri ottimali
 init = np.array([0.93, 1/8, 0.64]) #aiutano la convergenza del fit
@@ -136,6 +144,7 @@ ylabel = r'M [a.u.]'
 xlabel = r'$\beta - \beta_c$ [u.a.]$'
 
 pars2, dpars2 = grafici.fit(F, x, y, dy, init, 8, Title, xlabel, ylabel)
+
 
 ##stima di alpha
 print('\n')
