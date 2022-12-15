@@ -41,17 +41,17 @@ for i in range(1, npassi+1):
 
 Title = f'Simulazione del modello di Ising 2D tramite Metropolis \n Campo magnetico esterno B={H}'
 xlabel = r'$\beta$ [u.a.]' 
-"""  
+ 
 grafici.plot(B, E, dE, ret, 1, Title, xlabel, "Energia [u.a.]")
-"""
+
 grafici.plot(B, M, dM, ret, 2, Title, xlabel, "Magetizzazione [u.a.]")
-"""      
+      
 grafici.plot(B, C, dC, ret, 3, Title, xlabel, "Calore specifico [u.a.]")
                  
 grafici.plot(B, X, dX, ret, 4, Title, xlabel, "Suscettività [u.a.]") 
  
 grafici.plotbinder(B, cb, dcb, ret, 5, Title, xlabel, "Cumulante di binder") 
-"""
+
 #valore di beta ricavato
 bc = 0.661
 dbc = 0.001
@@ -59,7 +59,8 @@ print(f"beta critico = {bc:.3f} +- {dbc:.3f}")
 
 def F(x, m, g, q):
     '''
-    funzione modello per i fit successivi
+    funzione modello per 
+    i fit successivi
     '''
     return m*x**g + q
 
