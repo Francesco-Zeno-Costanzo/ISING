@@ -3,12 +3,29 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
        
 def plot(x, args, d_args, L, k, title, xlabel, ylabel):
-    '''
-    funzione che esegue i plot: args e d_ards devono essere delle
-    liste di array mente B deve esere un array
-    L è un array di indici che labella le curve in args e k il numero
-    della figura
-    '''        
+    """
+    Funzione che esegue dei plot di dati
+    su uno stesso grafico
+    
+    Parameters
+    ----------
+    x : 1darray
+        array sulle x, uguali per tutti
+    args : list
+        lista degli array sulle y
+    dargs : lista
+        lista degli errori sulle y
+    L : lista
+        lista che la bella i dati, da mettere nella legenda
+    k : int
+        numero del grafico
+    title : string
+        titolo del grafico
+    xlabel : string
+        label asse sulle x
+    ylabel : string
+        label asse sulle y
+    """
     plt.figure(k)
     plt.title(title)
     plt.xlabel(xlabel, fontsize=15)
@@ -25,12 +42,30 @@ def plot(x, args, d_args, L, k, title, xlabel, ylabel):
 
 
 def plotbinder(B, args, d_args, L, k, title, xlabel, ylabel):
-    '''
-    funzione che esegue il plot per il cumulante di binder:
-    args e d_ards devono essere delle liste di array mente
-    B deve esere un array L è un array di indici che labella
-    le curve in args e k il numero della figura
-    '''
+    """
+    Funzione che esegue il plot per il cumulante
+    di binder su uno stesso grafico con un sottografico
+    per evidenziare meglio l'intersezione delle curve
+    
+    Parameters
+    ----------
+    B : 1darray
+        array sulle x, uguali per tutti
+    args : list
+        lista degli array sulle y
+    dargs : lista
+        lista degli errory sulle y
+    L : lista
+        lista che la bella i dati, da mettere nella legenda
+    k : int
+        numero del grafico
+    title : string
+        titolo del grafico
+    xlabel : string
+        label asse sulle x
+    ylabel : string
+        label asse sulle y
+    """
     fig = plt.figure(k)
     main_ax = fig.add_subplot() #creo le variabili per il garfico
     main_ax.set_title(title)
@@ -55,7 +90,35 @@ def plotbinder(B, args, d_args, L, k, title, xlabel, ylabel):
     
 
 def FSS(B, q1, q2, bc, args, d_args, L, k, title, xlabel, ylabel):
-            
+    """
+    Funzione che esegue dei plot di dati
+    su uno stesso grafico per il finite size scaling
+    
+    Parameters
+    ----------
+    B : 1darray
+        array sulle x, uguali per tutti
+    q1 : float
+        indice critico per scaling sulle x
+    q2 : float
+        indice critico per scaling sulle y
+    bc : float
+        temperatura critica del sistema
+    args : list
+        lista degli array sulle y
+    dargs : lista
+        lista degli errory sulle y
+    L : lista
+        lista che la bella i dati, da mettere nella legenda
+    k : int
+        numero del grafico
+    title : string
+        titolo del grafico
+    xlabel : string
+        label asse sulle x
+    ylabel : string
+        label asse sulle y
+    """     
     plt.figure(k)
     plt.title(title)
     plt.xlabel(xlabel, fontsize=15)
@@ -70,14 +133,39 @@ def FSS(B, q1, q2, bc, args, d_args, L, k, title, xlabel, ylabel):
     
     
 def fit(F, x, y, dy, init, k, Title, xlabel, ylabel, plot=True):
-    '''
-    Funzione che esegui il fi e fa il plot associato
-    F è la funzione di fit, x l'array dei dati sulle x
-    y l'array di dati sulle y e dy il relativo errore
-    init è l'array dei parametri inizali e k il numero
-    della figura ceh può non essere visualizzata se
-    plot assume valore False, di default è True
-    '''
+    """
+    Funzione che esegue un fit
+    
+    Parameters
+    ----------
+    F : callable
+        funzione di fit
+    x : 1darray
+        array sulle x
+    y : 1darray
+        array sulle y
+    dy : 1darray
+        listra degli errory sulle y
+    init : 1darray
+        array di init per aiutare la convergenza del fit
+    k : int
+        numero del grafico
+    title : string
+        titolo del grafico
+    xlabel : string
+        label asse sulle x
+    ylabel : string
+        label asse sulle y
+    plot : bool
+        se True il grafico viene mostrato
+    
+    Return
+    ------
+    pars : 1darray
+        array parametri ottimali
+    err : 1darray
+        array errori sui parametri
+    """
     pars, covm = curve_fit(F, x, y, init, sigma=dy)
     err = np.sqrt(covm.diagonal())
     for p, dp, i in zip(pars, err, range(len(pars))):
@@ -121,9 +209,34 @@ def fit(F, x, y, dy, init, k, Title, xlabel, ylabel, plot=True):
     
     
 def plotfit(F, Pars, X, args, d_args, L, k, title, xlabel, ylabel):
-    '''
-    funzione per plottare più fit su un grafico
-    '''
+    """
+    Funzione che esegue dei plot di fit
+    su uno stesso grafico
+    
+    Parameters
+    ----------
+    F : callable
+        funzione di fit
+    Pars : lista
+        lista dei parametri ottimali    
+    X : lista
+        lista degli array sulle x
+    args : list
+        lista degli array sulle y
+    dargs : lista
+        lista degli errori sulle y
+    L : lista
+        lista che la bella i dati, da mettere nella legenda
+    k : int
+        numero del grafico
+    title : string
+        titolo del grafico
+    xlabel : string
+        label asse sulle x
+    ylabel : string
+        label asse sulle y
+        array di init per aiutare la convergenza del fit
+    """
     fig = plt.figure(k)
     
     frame1 = fig.add_axes((.1,.35,.8,.6))

@@ -14,7 +14,7 @@ C===============================================================
       call ranstart
 
       open(1, file='init.txt',status='old')		      !file coi parametri
-      open(2, file='dati/dati40.dat',status='unknown')	!file coi risultati
+      open(2, file='dati/dati50.dat',status='unknown')	!file coi risultati
 	
       read(1,*) misure           !numero di misure
       read(1,*) i_dec            !updating fra una misura e l'altra
@@ -31,7 +31,7 @@ C===============================================================
       call bordi()		   !condizioni di bordo continuo
       call init()		         !inizializzo la matrice
 	
-      !la scrittura avviene su un unico file che poi verra letto a blocchi
+      !la scrittura avviene su un unico file che poi verrà letto a blocchi
       !ogni blocco corrisponde ad una temperatura diversa
       !ci sono npassi blocchi, ciascuno lungo misure
       
@@ -67,7 +67,7 @@ C===============================================================
       
       elapsed = finish - start            !elapsed time in secodni
       i_h = elapsed/3600                  !ore trascorse
-      i_m = modulo(elapsed/60, 60)        !minuti trascorsi
+      i_m = modulo(int(elapsed/60), 60)   !minuti trascorsi
       i_s = modulo(int(elapsed), 60)      !secondi trascorsi
       
       write(*,*)
