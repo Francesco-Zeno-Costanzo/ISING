@@ -5,25 +5,27 @@ import grafici
 
 #il numero finale identifica la grandezza del reticolo
 E10, M10, C10, X10, cb10, dE10, dM10, dC10, dX10, dcb10 = np.loadtxt(r'datiplot/dati10.dat', unpack=True)
+E15, M15, C15, X15, cb15, dE15, dM15, dC15, dX15, dcb15 = np.loadtxt(r'datiplot/dati15.dat', unpack=True)
 E20, M20, C20, X20, cb20, dE20, dM20, dC20, dX20, dcb20 = np.loadtxt(r'datiplot/dati20.dat', unpack=True)
+E25, M25, C25, X25, cb25, dE25, dM25, dC25, dX25, dcb25 = np.loadtxt(r'datiplot/dati25.dat', unpack=True)
 E30, M30, C30, X30, cb30, dE30, dM30, dC30, dX30, dcb30 = np.loadtxt(r'datiplot/dati30.dat', unpack=True)
 E40, M40, C40, X40, cb40, dE40, dM40, dC40, dX40, dcb40 = np.loadtxt(r'datiplot/dati40.dat', unpack=True)
 E50, M50, C50, X50, cb50, dE50, dM50, dC50, dX50, dcb50 = np.loadtxt(r'datiplot/dati50.dat', unpack=True)
 
-ret = [10, 20, 30, 40, 50]
+ret = [10, 15, 20, 25, 30, 40, 50]
 
-E = [E10, E20, E30, E40, E50]
-M = [M10, M20, M30, M40, M50]
-C = [C10, C20, C30, C40, C50]
-X = [X10, X20, X30, X40, X50]
+E = [E10, E15, E20, E25, E30, E40, E50]
+M = [M10, M15, M20, M25, M30, M40, M50]
+C = [C10, C15, C20, C25, C30, C40, C50]
+X = [X10, X15, X20, X25, X30, X40, X50]
 
-dE = [dE10, dE20, dE30, dE40, dE50]
-dM = [dM10, dM20, dM30, dM40, dM50]
-dC = [dC10, dC20, dC30, dC40, dC50]
-dX = [dX10, dX20, dX30, dX40, dX50]
+dE = [dE10, dE15, dE20, dE25, dE30, dE40, dE50]
+dM = [dM10, dM15, dM20, dM25, dM30, dM40, dM50]
+dC = [dC10, dC15, dC20, dC25, dC30, dC40, dC50]
+dX = [dX10, dX15, dX20, dX25, dX30, dX40, dX50]
 
-cb = [cb10, cb20, cb30, cb40, cb50]
-dcb = [dcb10, dcb20, dcb30, dcb40, dcb50]
+cb = [cb10, cb15, cb20, cb25, cb30, cb40, cb50]
+dcb = [dcb10, dcb15, dcb20, dcb25, dcb30, dcb40, dcb50]
 H = 0
 
 
@@ -41,17 +43,17 @@ for i in range(1, npassi+1):
 
 Title = f'Simulazione del modello di Ising 2D tramite Metropolis \n Campo magnetico esterno B={H}'
 xlabel = r'$\beta$ [u.a.]' 
-"""  
+
 grafici.plot(B, E, dE, ret, 1, Title, xlabel, "Energia [u.a.]")
-"""
+
 grafici.plot(B, M, dM, ret, 2, Title, xlabel, "Magetizzazione [u.a.]")
-"""      
+      
 grafici.plot(B, C, dC, ret, 3, Title, xlabel, "Calore specifico [u.a.]")
                  
 grafici.plot(B, X, dX, ret, 4, Title, xlabel, "Suscettività [u.a.]") 
  
 grafici.plotbinder(B, cb, dcb, ret, 5, Title, xlabel, "Cumulante di binder") 
-"""
+
 #valore di beta ricavato
 bc = 0.661
 dbc = 0.001
