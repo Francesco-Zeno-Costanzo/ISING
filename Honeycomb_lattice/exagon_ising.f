@@ -14,7 +14,7 @@ C===============================================================
       call ranstart
 
       open(1, file='init.txt',status='old')		      !file coi parametri
-      open(2, file='dati/dati50.dat',status='unknown')	!file coi risultati
+      open(2, file='dati/dati45.dat',status='unknown')	!file coi risultati
 	
       read(1,*) misure           !numero di misure
       read(1,*) i_dec            !updating fra una misura e l'altra

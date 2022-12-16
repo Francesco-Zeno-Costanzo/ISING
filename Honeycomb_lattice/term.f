@@ -11,8 +11,8 @@
 	
       !apro file da cui leggere i dati da analizzare e file su
       !cui scrivere i risultati con relativi errori
-      open(unit=0, file="dati/dati50.dat", status="old", action="read")
-      open(unit=2, file='datiplot/dati50.dat',status='unknown')
+      open(unit=0, file="dati/dati45.dat", status="old", action="read")
+      open(unit=2, file='datiplot/dati45.dat',status='unknown')
 	
       R = 100				!numero di ricampionamenti
       
