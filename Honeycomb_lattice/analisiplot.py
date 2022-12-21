@@ -26,11 +26,11 @@ for i, l in enumerate(L):
     CB.append(cb) ; dCB.append(dcb)
 
 
-'''
--------------------------------------------------------------------------
-Alcuni plot a titolo espositivo
--------------------------------------------------------------------------
-'''
+
+#-------------------------------------------------------------------------
+#Alcuni plot a titolo espositivo
+#-------------------------------------------------------------------------
+
 
 #calcolo array temperature
 par = np.loadtxt(r'init.txt', max_rows=6, unpack=True)
@@ -45,27 +45,20 @@ for i in range(1, npassi+1):
 Title = f'Ising 2D su reticolo esagonale'
 xlabel = r'$\beta$ [u.a.]' 
 
-grafici.plot(B, E, dE, L, 1, Title, xlabel, "Energia [u.a.]")
+#grafici.plot(B, E, dE, L, 1, Title, xlabel, "Energia [u.a.]")
 
-grafici.plot(B, M, dM, L, 2, Title, xlabel, "Magetizzazione [u.a.]")
+#grafici.plot(B, M, dM, L, 2, Title, xlabel, "Magetizzazione [u.a.]")
       
-grafici.plot(B, C, dC, L, 3, Title, xlabel, "Calore specifico [u.a.]")
+#grafici.plot(B, C, dC, L, 3, Title, xlabel, "Calore specifico [u.a.]")
                  
-grafici.plot(B, X, dX, L, 4, Title, xlabel, "Suscettività [u.a.]") 
+#grafici.plot(B, X, dX, L, 4, Title, xlabel, "Suscettività [u.a.]") 
  
-grafici.plotbinder(B, CB, dCB, L, 5, Title, xlabel, "Cumulante di binder") 
+#grafici.plotbinder(B, CB, dCB, L, 5, Title, xlabel, "Cumulante di binder") 
 
 #valore di beta ricavato
 bc = 0.661
 dbc = 0.001
 print(f"beta critico = {bc:.3f} +- {dbc:.3f} \n ")
-
-
-'''
--------------------------------------------------------------------------
-Stima di gamma/nu
--------------------------------------------------------------------------
-'''
 
 def F(x, m, g, q):
     '''
@@ -73,8 +66,6 @@ def F(x, m, g, q):
     '''
     return m*x**g + q
 
-
-print('stima di gamma/nu \n')
 
 #funzione per estrarre il massimo della suscettività e relativo errore
 def MS(*arg):
@@ -101,6 +92,14 @@ def MS(*arg):
 			
     return l, dl
 
+"""
+
+#-------------------------------------------------------------------------
+#Stima di gamma/nu
+#-------------------------------------------------------------------------
+
+print('stima di gamma/nu \n')
+
 TOT = X + dX
 MX, dMX = MS(*TOT)
 
@@ -112,16 +111,17 @@ init = np.array([1, 1, 1])
 
 pars, dpars = grafici.fit(F, L, MX, dMX, init, 6, Title, xlabel, ylabel)
 
-'''
--------------------------------------------------------------------------
-Stima di gamma
--------------------------------------------------------------------------
-'''
+
+#-------------------------------------------------------------------------
+#Stima di gamma
+#-------------------------------------------------------------------------
+
 print('----------------------------------------------- \n')
 print('stima di gamma \n')
 
 # dato che prima abbiamo stimato gamma/nu con
 # questa stima possiamo stimare sia gamma che nu
+
 index1 = 57                     #seleziono solo un range dei dati
 index2 = 87
 x  =      B[index1:index2]-bc   #temperatura ridotta
@@ -137,46 +137,55 @@ xlabel = r'$\beta - \beta_c$ [u.a.]'
 
 pars1, dpars1 = grafici.fit(F, x, y, dy, init, 7, Title, xlabel, ylabel)
 
-'''
--------------------------------------------------------------------------
-Stima di beta
--------------------------------------------------------------------------
-'''
+
+#-------------------------------------------------------------------------
+#Stima di beta
+#-------------------------------------------------------------------------
+
 print('----------------------------------------------- \n')
 print('stima di beta \n')
 
+def G(x, m, g):
+    '''
+    funzione modello per il fit di beta senza intercetta
+    '''
+    return m*x**g
+
+indxcrit = 51 #Per stimare questo indice va calcolato nelle altre osservabili l'indice di beta pseudo_crit
+
 #selezione della manetizzazione al punto critico per i vari reticoli
-y  = np.array([ M[i][52] for i in range(len(L))])
-dy = np.array([dM[i][52] for i in range(len(L))])
+y  = np.array([ M[i][indxcrit] for i in range(len(L))])
+dy = np.array([dM[i][indxcrit] for i in range(len(L))])
 
 #valori che mi aspetto per i parametri ottimali
-init = np.array([0.35, -1/8, 1]) #aiutano la convergenza del fit
+init = np.array([0.9, -0.08]) #aiutano la convergenza del fit
 
-Title = 'Massimo della suscettività al variare di L'
+Title = 'Magnetizzazione al punto critico al variare di L'
 ylabel = r'$M_{\beta_c}$ [a.u.]'
 xlabel = r'L [a.u.]'
 
-pars2, dpars2 = grafici.fit(F, L, y, dy, init, 8, Title, xlabel, ylabel)
+pars2, dpars2 = grafici.fit(G, L, y, dy, init, 8, Title, xlabel, ylabel)
+"""
 
-'''
--------------------------------------------------------------------------
-Stima di alpha
--------------------------------------------------------------------------
-'''
+
+#-------------------------------------------------------------------------
+#Stima di alpha
+#-------------------------------------------------------------------------
+
 print('----------------------------------------------- \n')
 print('stima di alpha \n')
 
-def Fa(x, m, g):
+def Fa(x, m, g, q):
     '''funzione modello per i fit successivi
     '''
-    return m*x**g 
+    return m*x**g + q*np.log(x)
 
 TOT = C + dC
 CM, dCM = MS(*TOT)
 
 
 #valori che mi aspetto per i parametri ottimali
-init = np.array([0.1, 0]) #aiutano la convergenza del fit
+init = np.array([0.1, 0, 2]) #aiutano la convergenza del fit
 
 Title = 'Massimo del calore specifico al variare di L'
 ylabel = r'$C_{max}$ [a.u.]'
@@ -184,11 +193,12 @@ xlabel = r'$\beta - \beta_c$ [u.a.]'
 
 pars3, dpars3 = grafici.fit(Fa, L, CM, dCM, init, 9, Title, xlabel, ylabel)
 print('----------------------------------------------- \n')
-'''
--------------------------------------------------------------------------
-Caclolo deigli indici critici ed associati errori
--------------------------------------------------------------------------
-'''
+
+"""
+#-------------------------------------------------------------------------
+#Calcolo deigli indici critici ed associati errori
+#-------------------------------------------------------------------------
+
 
 g = -pars1[1]
 dg = dpars[1]
@@ -215,11 +225,13 @@ print('db    = %.5f' %(pars2[1]-1/8))
 print('dg    = %.5f' %(pars1[1]+7/4))
 print('da    = %.5f' %(pars3[1]-0))
 
-'''
--------------------------------------------------------------------------
-Grafici del finite size scaling
--------------------------------------------------------------------------
-'''
+
+
+
+#-------------------------------------------------------------------------
+#Grafici del finite size scaling
+#-------------------------------------------------------------------------
+
 
 Title = 'Finite size scaling della magnetizzazione'
 xlabel = r'$(\beta-\beta_c)L^{1/ \nu}$'
@@ -238,5 +250,7 @@ xlabel = r'$(\beta-\beta_c)L^{1/ \nu}$'
 ylabel = r'$ \chi /L^{\gamma/ \nu}$'
 
 grafici.FSS(B, 1/n, a/n, bc, C, dC, L, 12, Title, xlabel, ylabel) 
+
+"""
 
 plt.show()

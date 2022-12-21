@@ -6,7 +6,9 @@ L = 15, eta: 23 min
 L = 20, eta: 44 min
 L = 25, eta: 1 h 5 min
 L = 30, eta: 1 h 30 min
+L = 35, eta: 2 h 20 min
 L = 40, eta: 3 h
+L = 45, eta: 3 h 45 min
 L = 50, eta: 4 h 37 min
 
 #Analisi
@@ -15,7 +17,9 @@ L = 15, eta: 22 s
 L = 20, eta: 21 s
 L = 25, eta: 22 s
 L = 30, eta: 22 s
+L = 35, eta: 22 s
 L = 40, eta: 21 s
+L = 45, eta: 23 s
 L = 50, eta: 22 s
 
 #Analisi Python
@@ -25,6 +29,8 @@ $\beta_c = 0.661(1)$
 
 | Indici critici | Valore atteso | Valore calcolato |
 | ----------- | ----------- | ----------- |
-| $\beta$      |     $\frac18$   | |
+| $\beta$      |     $\frac18$ \sim 0.25  | -0.6(1) |
 | $\frac\gamma\nu$   |   $\frac74 \sim 7.5$  | 1.84(2) |
 | $\gamma$ | $\frac74$ | -1.75(2) |
+| $\nu$ | 1 | 0.99(2) |
+| $\alpha$ | 0 | 0.232(5) |

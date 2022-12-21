@@ -166,7 +166,7 @@ def fit(F, x, y, dy, init, k, Title, xlabel, ylabel, plot=True):
     err : 1darray
         array errori sui parametri
     """
-    pars, covm = curve_fit(F, x, y, init, sigma=dy)
+    pars, covm = curve_fit(F, x, y, init, sigma=dy)  
     err = np.sqrt(covm.diagonal())
     for p, dp, i in zip(pars, err, range(len(pars))):
         print(f"pars{i} = {p:.5f} +- {dp:.5f}")
