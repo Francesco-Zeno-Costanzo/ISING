@@ -3,36 +3,45 @@ import matplotlib.pyplot as plt
 
 import grafici
 
-path = r'datiplot/'        #path dei dati
+path = r'datiplot/'  # path dei dati
 
-L = np.arange(10, 50+1, 5) #reticoli considerati
+L = np.arange(10, 50+1, 5)  # reticoli considerati
 
-#liste i cui elementi saranno le curve delle quantità termodinamiche
-E = [] ; dE = []           #energia del sistema ed errore
-M = [] ; dM = []           #magnetizzazione del sistema ed errore
-C = [] ; dC = []           #calore specifico del sistema ed errore
-X = [] ; dX = []           #suscettività del sistema ed errore
+# liste i cui elementi saranno le curve delle quantità termodinamiche
+E = []
+dE = []  # energia del sistema ed errore
+M = []
+dM = []  # magnetizzazione del sistema ed errore
+C = []
+dC = []  # calore specifico del sistema ed errore
+X = []
+dX = []  # suscettività del sistema ed errore
 
-CB = [] ; dCB = []         #cumulante di binder
+CB = []
+dCB = []  # cumulante di binder
 
 for i, l in enumerate(L):
-    #Leggo i dati al variare di L e li conservo
+    # Leggo i dati al variare di L e li conservo
     Data = np.loadtxt(path+f'dati{l}.dat', unpack=True)
     ene, mag, cal, chi, cb, dene, dmag, dcal, dchi, dcb = Data
-    E.append(ene) ; dE.append(dene)
-    M.append(mag) ; dM.append(dmag)
-    C.append(cal) ; dC.append(dcal)
-    X.append(chi) ; dX.append(dchi)
-    CB.append(cb) ; dCB.append(dcb)
+    E.append(ene)
+    dE.append(dene)
+    M.append(mag)
+    dM.append(dmag)
+    C.append(cal)
+    dC.append(dcal)
+    X.append(chi)
+    dX.append(dchi)
+    CB.append(cb)
+    dCB.append(dcb)
 
 
+# -------------------------------------------------------------------------
+# Alcuni plot a titolo espositivo
+# -------------------------------------------------------------------------
 
-#-------------------------------------------------------------------------
-#Alcuni plot a titolo espositivo
-#-------------------------------------------------------------------------
 
-
-#calcolo array temperature
+# calcolo array temperature
 par = np.loadtxt(r'init.txt', max_rows=6, unpack=True)
 bmin, bmax, npassi = par[3:6]
 
@@ -43,22 +52,23 @@ for i in range(1, npassi+1):
     B[i-1] = bmin + (i-1)*(bmax - bmin)/(npassi-1)
 
 Title = f'Ising 2D su reticolo esagonale'
-xlabel = r'$\beta$ [u.a.]' 
+xlabel = r'$\beta$ [u.a.]'
 
-#grafici.plot(B, E, dE, L, 1, Title, xlabel, "Energia [u.a.]")
+# grafici.plot(B, E, dE, L, 1, Title, xlabel, "Energia [u.a.]")
 
-#grafici.plot(B, M, dM, L, 2, Title, xlabel, "Magetizzazione [u.a.]")
-      
-#grafici.plot(B, C, dC, L, 3, Title, xlabel, "Calore specifico [u.a.]")
-                 
-#grafici.plot(B, X, dX, L, 4, Title, xlabel, "Suscettività [u.a.]") 
- 
-#grafici.plotbinder(B, CB, dCB, L, 5, Title, xlabel, "Cumulante di binder") 
+# grafici.plot(B, M, dM, L, 2, Title, xlabel, "Magetizzazione [u.a.]")
 
-#valore di beta ricavato
+# grafici.plot(B, C, dC, L, 3, Title, xlabel, "Calore specifico [u.a.]")
+
+# grafici.plot(B, X, dX, L, 4, Title, xlabel, "Suscettività [u.a.]")
+
+# grafici.plotbinder(B, CB, dCB, L, 5, Title, xlabel, "Cumulante di binder")
+
+# valore di beta ricavato
 bc = 0.661
 dbc = 0.001
 print(f"beta critico = {bc:.3f} +- {dbc:.3f} \n ")
+
 
 def F(x, m, g, q):
     '''
@@ -67,7 +77,7 @@ def F(x, m, g, q):
     return m*x**g + q
 
 
-#funzione per estrarre il massimo della suscettività e relativo errore
+# funzione per estrarre il massimo della suscettività e relativo errore
 def MS(*arg):
     '''
     *arg permette alla funzione di prendere in input infiniti argomenti.
@@ -75,25 +85,27 @@ def MS(*arg):
     gli array dei valori centrali mentre la seconda parte quelli degli errori.
     Restitusce due array contenenti il massimo dei valori centrali e relativi errori
     '''
-    Q = len(arg)//2 #lunghezza degli array
+    Q = len(arg)//2  # lunghezza degli array
     l = np.zeros(Q)
     dl = np.zeros(Q)
-    k = np.zeros(Q, dtype=np.int64)#verra usato come indice quindi deve essere intero
-	
+    # verra usato come indice quindi deve essere intero
+    k = np.zeros(Q, dtype=np.int64)
+
     for i in range(len(arg)):
 
         if i < Q:
-            l[i] = np.max(arg[i]) #trovo il massimo
-            k[i] = np.where(arg[i] == l[i])[0][0] #conservo il rispettivo indice
-			
+            l[i] = np.max(arg[i])  # trovo il massimo
+            # conservo il rispettivo indice
+            k[i] = np.where(arg[i] == l[i])[0][0]
+
         else:
-            #trovo il valore dell'errore del punto usando l'indice
+            # trovo il valore dell'errore del punto usando l'indice
             dl[i-Q] = arg[i][k[i-Q]]
-			
+
     return l, dl
 
 
-
+"""
 #-------------------------------------------------------------------------
 #Stima di gamma/nu
 #-------------------------------------------------------------------------
@@ -136,14 +148,15 @@ ylabel = r'$\chi$ [a.u.]'
 xlabel = r'$\beta - \beta_c$ [u.a.]'
 
 pars1, dpars1 = grafici.fit(F, x, y, dy, init, 7, Title, xlabel, ylabel)
+"""
 
-
-#-------------------------------------------------------------------------
-#Stima di beta
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
+# Stima di beta/nu
+# -------------------------------------------------------------------------
 
 print('----------------------------------------------- \n')
-print('stima di beta \n')
+print('stima di beta/nu \n')
+
 
 def G(x, m, g):
     '''
@@ -152,15 +165,17 @@ def G(x, m, g):
     return m*x**g
 
 
-#Per stimare questo indice va calcolato nelle altre osservabili l'indice di beta pseudo_crit
-indxcrit = 51 
+# Per stimare questo indice va calcolato nelle altre osservabili l'indice di beta pseudo_crit
+indx_crit_arr = np.zeros(len(L), dtype=np.int64)
+for i in range(len(L)):
+    indx_crit_arr[i] = int(np.argmax(X[i]))
 
-#selezione della manetizzazione al punto critico per i vari reticoli
-y  = np.array([ M[i][indxcrit] for i in range(len(L))])
-dy = np.array([dM[i][indxcrit] for i in range(len(L))])
+# selezione della manetizzazione al punto pseudo critico per i vari reticoli
+y = np.array([M[i][indx_crit_arr[i]] for i in range(len(L))])
+dy = np.array([dM[i][indx_crit_arr[i]] for i in range(len(L))])
 
-#valori che mi aspetto per i parametri ottimali
-init = np.array([0.9, -1/8]) #aiutano la convergenza del fit
+# valori che mi aspetto per i parametri ottimali
+init = np.array([0.9, -1/8])  # aiutano la convergenza del fit
 
 Title = 'Magnetizzazione al punto critico al variare di L'
 ylabel = r'$M_{\beta_c}$ [a.u.]'
@@ -168,7 +183,7 @@ xlabel = r'L [a.u.]'
 
 pars2, dpars2 = grafici.fit(G, L, y, dy, init, 8, Title, xlabel, ylabel)
 
-
+"""
 
 #-------------------------------------------------------------------------
 #Stima di alpha
@@ -178,7 +193,8 @@ print('----------------------------------------------- \n')
 print('stima di alpha \n')
 
 def Fa(x, m, g, q):
-    '''funzione modello per i fit successivi
+    '''
+    funzione modello per i fit successivi
     '''
     return m*x**g*(1 + q*np.log(x) + np.log(2))
 
@@ -187,7 +203,7 @@ CM, dCM = MS(*TOT)
 
 
 #valori che mi aspetto per i parametri ottimali
-init = np.array([0.5, 0.1, 2]) #aiutano la convergenza del fit
+init = np.array([1, 0, 1]) #aiutano la convergenza del fit
 
 Title = 'Massimo del calore specifico al variare di L'
 ylabel = r'$C_{max}$ [a.u.]'
@@ -260,6 +276,6 @@ for i in range(len(L)):
 
 grafici.FSS(B, 1/n, a/n, bc, C, dC, L, 12, Title, xlabel, ylabel) 
 
-
+"""
 
 plt.show()
