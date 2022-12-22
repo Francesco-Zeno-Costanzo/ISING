@@ -92,7 +92,7 @@ def MS(*arg):
 			
     return l, dl
 
-"""
+
 
 #-------------------------------------------------------------------------
 #Stima di gamma/nu
@@ -151,21 +151,23 @@ def G(x, m, g):
     '''
     return m*x**g
 
-indxcrit = 51 #Per stimare questo indice va calcolato nelle altre osservabili l'indice di beta pseudo_crit
+
+#Per stimare questo indice va calcolato nelle altre osservabili l'indice di beta pseudo_crit
+indxcrit = 51 
 
 #selezione della manetizzazione al punto critico per i vari reticoli
 y  = np.array([ M[i][indxcrit] for i in range(len(L))])
 dy = np.array([dM[i][indxcrit] for i in range(len(L))])
 
 #valori che mi aspetto per i parametri ottimali
-init = np.array([0.9, -0.08]) #aiutano la convergenza del fit
+init = np.array([0.9, -1/8]) #aiutano la convergenza del fit
 
 Title = 'Magnetizzazione al punto critico al variare di L'
 ylabel = r'$M_{\beta_c}$ [a.u.]'
 xlabel = r'L [a.u.]'
 
 pars2, dpars2 = grafici.fit(G, L, y, dy, init, 8, Title, xlabel, ylabel)
-"""
+
 
 
 #-------------------------------------------------------------------------
@@ -178,14 +180,14 @@ print('stima di alpha \n')
 def Fa(x, m, g, q):
     '''funzione modello per i fit successivi
     '''
-    return m*x**g + q*np.log(x)
+    return m*x**g*(1 + q*np.log(x) + np.log(2))
 
 TOT = C + dC
 CM, dCM = MS(*TOT)
 
 
 #valori che mi aspetto per i parametri ottimali
-init = np.array([0.1, 0, 2]) #aiutano la convergenza del fit
+init = np.array([0.5, 0.1, 2]) #aiutano la convergenza del fit
 
 Title = 'Massimo del calore specifico al variare di L'
 ylabel = r'$C_{max}$ [a.u.]'
@@ -194,7 +196,7 @@ xlabel = r'$\beta - \beta_c$ [u.a.]'
 pars3, dpars3 = grafici.fit(Fa, L, CM, dCM, init, 9, Title, xlabel, ylabel)
 print('----------------------------------------------- \n')
 
-"""
+
 #-------------------------------------------------------------------------
 #Calcolo deigli indici critici ed associati errori
 #-------------------------------------------------------------------------
@@ -206,10 +208,10 @@ dg = dpars[1]
 n = -pars1[1]/pars[1]
 dn = np.sqrt((dpars[1]/pars[1])**2 + (dpars[1]/pars1[1])**2)*n
 
-b = pars2[1]
+b = abs(pars2[1])
 db = dpars2[1]
 
-a = pars3[1]
+a = abs(pars3[1])
 da = dpars3[1]
 
 
@@ -233,6 +235,7 @@ print('da    = %.5f' %(pars3[1]-0))
 #-------------------------------------------------------------------------
 
 
+
 Title = 'Finite size scaling della magnetizzazione'
 xlabel = r'$(\beta-\beta_c)L^{1/ \nu}$'
 ylabel = r'$|M|/L^{-b/ \nu}$'
@@ -247,10 +250,16 @@ grafici.FSS(B, 1/n, g/n, bc, X, dX, L, 11, Title, xlabel, ylabel)
 
 Title = 'Finite size scaling del calore specifico'
 xlabel = r'$(\beta-\beta_c)L^{1/ \nu}$'
-ylabel = r'$ \chi /L^{\gamma/ \nu}$'
+ylabel = r'$ C /L^{\alpha/ \nu}$'
+
+#Per tenere conto delle correzzioni logaritmiche
+for i in range(len(L)):
+    for j in range(len(B)):
+        C[i][j]  /= np.log(2*L[i]**2)
+        dC[i][j] /= np.log(2*L[i]**2)
 
 grafici.FSS(B, 1/n, a/n, bc, C, dC, L, 12, Title, xlabel, ylabel) 
 
-"""
+
 
 plt.show()
