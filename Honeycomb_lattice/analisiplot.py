@@ -8,32 +8,22 @@ path = r'datiplot/'  # path dei dati
 L = np.arange(10, 50+1, 5)  # reticoli considerati
 
 # liste i cui elementi saranno le curve delle quantità termodinamiche
-E = []
-dE = []  # energia del sistema ed errore
-M = []
-dM = []  # magnetizzazione del sistema ed errore
-C = []
-dC = []  # calore specifico del sistema ed errore
-X = []
-dX = []  # suscettività del sistema ed errore
+E = [] ; dE = []  # energia del sistema ed errore
+M = [] ; dM = []  # magnetizzazione del sistema ed errore
+C = [] ; dC = []  # calore specifico del sistema ed errore
+X = [] ; dX = []  # suscettività del sistema ed errore
 
-CB = []
-dCB = []  # cumulante di binder
+CB = [] ; dCB = []  # cumulante di binder
 
 for i, l in enumerate(L):
     # Leggo i dati al variare di L e li conservo
     Data = np.loadtxt(path+f'dati{l}.dat', unpack=True)
     ene, mag, cal, chi, cb, dene, dmag, dcal, dchi, dcb = Data
-    E.append(ene)
-    dE.append(dene)
-    M.append(mag)
-    dM.append(dmag)
-    C.append(cal)
-    dC.append(dcal)
-    X.append(chi)
-    dX.append(dchi)
-    CB.append(cb)
-    dCB.append(dcb)
+    E.append(ene) ; dE.append(dene)
+    M.append(mag) ; dM.append(dmag)
+    C.append(cal) ; dC.append(dcal)
+    X.append(chi) ; dX.append(dchi)
+    CB.append(cb) ; dCB.append(dcb)
 
 
 # -------------------------------------------------------------------------
@@ -54,15 +44,15 @@ for i in range(1, npassi+1):
 Title = f'Ising 2D su reticolo esagonale'
 xlabel = r'$\beta$ [u.a.]'
 
-# grafici.plot(B, E, dE, L, 1, Title, xlabel, "Energia [u.a.]")
+grafici.plot(B, E, dE, L, 1, Title, xlabel, "Energia [u.a.]")
 
-# grafici.plot(B, M, dM, L, 2, Title, xlabel, "Magetizzazione [u.a.]")
+grafici.plot(B, M, dM, L, 2, Title, xlabel, "Magetizzazione [u.a.]")
 
-# grafici.plot(B, C, dC, L, 3, Title, xlabel, "Calore specifico [u.a.]")
+grafici.plot(B, C, dC, L, 3, Title, xlabel, "Calore specifico [u.a.]")
 
-# grafici.plot(B, X, dX, L, 4, Title, xlabel, "Suscettività [u.a.]")
+grafici.plot(B, X, dX, L, 4, Title, xlabel, "Suscettività [u.a.]")
 
-# grafici.plotbinder(B, CB, dCB, L, 5, Title, xlabel, "Cumulante di binder")
+grafici.plotbinder(B, CB, dCB, L, 5, Title, xlabel, "Cumulante di binder")
 
 # valore di beta ricavato
 bc = 0.661
@@ -105,7 +95,7 @@ def MS(*arg):
     return l, dl
 
 
-"""
+
 #-------------------------------------------------------------------------
 #Stima di gamma/nu
 #-------------------------------------------------------------------------
@@ -148,7 +138,7 @@ ylabel = r'$\chi$ [a.u.]'
 xlabel = r'$\beta - \beta_c$ [u.a.]'
 
 pars1, dpars1 = grafici.fit(F, x, y, dy, init, 7, Title, xlabel, ylabel)
-"""
+
 
 # -------------------------------------------------------------------------
 # Stima di beta/nu
@@ -166,24 +156,22 @@ def G(x, m, g):
 
 
 # Per stimare questo indice va calcolato nelle altre osservabili l'indice di beta pseudo_crit
-indx_crit_arr = np.zeros(len(L), dtype=np.int64)
-for i in range(len(L)):
-    indx_crit_arr[i] = int(np.argmax(X[i]))
-
+index_crit = 51
 # selezione della manetizzazione al punto pseudo critico per i vari reticoli
-y = np.array([M[i][indx_crit_arr[i]] for i in range(len(L))])
-dy = np.array([dM[i][indx_crit_arr[i]] for i in range(len(L))])
+x = L
+y = np.array( [ M[i][index_crit] for i in range(len(L))])
+dy = np.array([dM[i][index_crit] for i in range(len(L))])
 
 # valori che mi aspetto per i parametri ottimali
-init = np.array([0.9, -1/8])  # aiutano la convergenza del fit
+init = np.array([0.06723, 1/8])  # aiutano la convergenza del fit
 
 Title = 'Magnetizzazione al punto critico al variare di L'
 ylabel = r'$M_{\beta_c}$ [a.u.]'
 xlabel = r'L [a.u.]'
 
-pars2, dpars2 = grafici.fit(G, L, y, dy, init, 8, Title, xlabel, ylabel)
+pars2, dpars2 = grafici.fit(G, x, y, dy, init, 8, Title, xlabel, ylabel)
 
-"""
+
 
 #-------------------------------------------------------------------------
 #Stima di alpha
@@ -276,6 +264,6 @@ for i in range(len(L)):
 
 grafici.FSS(B, 1/n, a/n, bc, C, dC, L, 12, Title, xlabel, ylabel) 
 
-"""
+
 
 plt.show()
