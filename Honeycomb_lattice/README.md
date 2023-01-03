@@ -31,7 +31,7 @@ Prendiamo 100 mila misure, con indice di decorrelazione 10. Il range di temperat
 # Analisi Python
 I parametri che restituiscono gli indici critici nel programma sono i pars1
 
-$\beta_c = 0.661(1)$
+$\beta_c = 0.66(1)$
 
 | Indici critici | Valore atteso | Valore calcolato |
 | ----------- | ----------- | ----------- |
