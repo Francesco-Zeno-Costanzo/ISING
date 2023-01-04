@@ -254,7 +254,7 @@ grafici.FSS(B, 1/n, g/n, bc, X, dX, L, 11, Title, xlabel, ylabel)
 
 Title = 'Finite size scaling del calore specifico'
 xlabel = r'$(\beta-\beta_c)L^{1/ \nu}$'
-ylabel = r'$ C /L^{\alpha/ \nu}$'
+ylabel = r'$ C /(L^{\alpha/ \nu} \log(2L^2))$'
 
 #Per tenere conto delle correzzioni logaritmiche
 for i in range(len(L)):
