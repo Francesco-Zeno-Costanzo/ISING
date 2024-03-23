@@ -4,9 +4,18 @@
       integer campo
       
       common/reticolo/campo(nvol)
-      common/vicini/n1(nvol),n2(nvol),n3(nvol)
-      
-      common/vario/bext,J_acc
+
+      ! Primi vicini
+      common/vicinip/nn1(nvol),nn2(nvol),nn3(nvol)
+
+      ! Secondi vicini
+      common/vicinis/nnn1(nvol),nnn2(nvol),nnn3(nvol)
+     &               nnn4(nvol),nnn5(nvol),nnn6(nvol)
+
+      ! Terzi Vicini
+      common/vicinit/nnnn1(nvol),nnnn2(nvol),nnnn3(nvol)
+
+      common/vario/bext,J_1,J_2,J_3
       
 C================================================================
 C file che permette di cambiare più facilmente i parametri della
