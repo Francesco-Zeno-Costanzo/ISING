@@ -11,8 +11,8 @@
 
       !apro file da cui leggere i dati da analizzare e file su
       !cui scrivere i risultati con relativi errori
-      open(unit=0, file="data/data_J2_05.dat", status="old")
-      open(unit=2, file='dataplot/data_J2_05.dat',status='unknown')
+      open(unit=0, file="data/data_L_10_J2_01.dat", status="old")
+      open(unit=2, file='dataplot/data_L_10_J2_01.dat',status='unknown')
 
       R  = 100              ! Numero di ricampionamenti
       DB = 1000             ! Dimesione blocchi
