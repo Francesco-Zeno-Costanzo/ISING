@@ -1,135 +1,135 @@
       program analisi
-	
+
       real*8, dimension(:), allocatable :: Ene, Mag
       real*8:: daver_e, daver_m, daver_c, daver_x, dcb
       real*8:: aver_e, aver_m, aver_c, aver_x, cb
       integer :: R
+      integer(16) :: DB
       
-      common N, R, nvol
       call cpu_time(start)
       call ranstart
-	
+
       !apro file da cui leggere i dati da analizzare e file su
       !cui scrivere i risultati con relativi errori
-      open(unit=0, file="dati/dati45.dat", status="old", action="read")
-      open(unit=2, file='datiplot/dati45.dat',status='unknown')
-	
-      R = 100				!numero di ricampionamenti
+      open(unit=0, file="data/data_J2_05.dat", status="old")
+      open(unit=2, file='dataplot/data_J2_05.dat',status='unknown')
+
+      R  = 100              ! Numero di ricampionamenti
+      DB = 1000             ! Dimesione blocchi
       
-      read(0, *) N			!leggo i primi valori che sono 
-      read(0, *) nvol			!necessari per l'analisi
+      read(0, *) N          ! Leggo i primi valori che sono
+      read(0, *) nvol       ! necessari per l'analisi
       read(0, *) npassi
-	
+
       allocate(Ene(N), Mag(N))
 
-      do j=1, npassi			  !leggo a blocchi il file
-          do i = 1, N		        !ogni blocco una temperatura diversa
-	        read(0, *) Mag(i), Ene(i)
-	    enddo
-	  
-	    aver_e = sum(Ene)/float(N*nvol) 	!Energia media
-	    aver_m = sum(Mag)/float(N*nvol)		!magnetizzazione media
-		
-	    c = (sum(Ene**2)/float(N) - (sum(Ene)/float(N))**2)
-	    x = (sum(Mag**2)/float(N) - (sum(Mag)/float(N))**2)
-		
-	    aver_c = c/float(nvol)			!calore specifico medio
-	    aver_x = x/float(nvol)			!suscettività media
-		
-	    cb = (sum(Mag**4)/(sum(Mag**2)**2))*N !cumulante di binder
+      do j=1, npassi                   ! leggo a blocchi il file
+          do i = 1, N                  ! ogni blocco una temperatura diversa
+              read(0, *) Mag(i), Ene(i)
+          enddo
 
-	    !calcolo errore con bootstrap, se l'ultimo parametro è 1
-	    !viene calcolato anche l'errore sul cumulate di binder
-		
-   	    call errore(Ene, daver_e, daver_c, dcb, 0)
-   	    call errore(Mag, daver_m, daver_x, dcb, 1)
+          aver_e = sum(Ene)/float(N*nvol)    ! Energia media
+          aver_m = sum(Mag)/float(N*nvol)    ! Magnetizzazione media
 
-    	    write(2,*) aver_e, aver_m, aver_c, aver_x, cb,	!salvo su file
-     &	         daver_e, daver_m, daver_c, daver_x, dcb
-		
+          c = (sum(Ene**2)/float(N) - (sum(Ene)/float(N))**2)
+          x = (sum(Mag**2)/float(N) - (sum(Mag)/float(N))**2)
+
+          aver_c = c/float(nvol)            ! Calore specifico medio
+          aver_x = x/float(nvol)            ! Suscettività media
+
+          cb = (sum(Mag**4)/(sum(Mag**2)**2))*N !cumulante di binder
+
+          !calcolo errore con bootstrap, se l'ultimo parametro è 1
+          !viene calcolato anche l'errore sul cumulate di binder
+
+          call bootstrap(N, Ene, daver_e, 0, R, nvol, DB)
+          call bootstrap(N, Mag, daver_m, 0, R, nvol, DB)
+          call bootstrap(N, Ene, daver_c, 1, R, nvol, DB)
+          call bootstrap(N, Mag, daver_x, 1, R, nvol, DB)
+
+          write(2,*) aver_e, aver_m, aver_c, aver_x,  !salvo su file
+     &             daver_e, daver_m, daver_c, daver_x
+
       enddo
-	
+
       call ranfinish
-	
+
       call cpu_time(finish)
       print '("tempo di esecuzione= ", f8.4," secondi.")', finish-start
 
       end program analisi
 
-	
 C=============================================================================
 C Subroutine per il calcolo degli errori tramite binned bootstrap
 C=============================================================================
 
+      subroutine bootstrap(N, x, dx, ics, R, nvol, Db)
+C=============================================================================
+C     Subroutine for calculating errors using binned bootstrap
+C
+C     Parameters
+C     N : int
+C         size of data, length(x)
+C     x : one dimensional array of  length(x) = N
+C         data, markov chain
+C     dx : float
+C         variable to which the error will be written
+C     ics : int
+C         flag if 0 computere error on mean, if 1 compute error on variance
+C     R : int
+C         number of resampling
+C     nvol : float
+C         volume of lattice
+C     Db : int
+C         seize of the blocks
+C=============================================================================
+      real*8, dimension(:), allocatable :: z, a   ! axuliar array
+      real*8, dimension(N) :: x                   ! initial array
+      integer(16) :: nb, Db, i, j, l              ! parameter and indices
+      real*8 :: media_x, dx                       ! final results
+      integer :: g, R, ics                        ! others, pamaters
 
-      subroutine errore(x, dx, dx1, db, B)
-      common N, R, nvol
-      
-      real*8, dimension(:), allocatable :: z, u, a, q
-      real*8, dimension(N) :: x
-      integer(16) :: nb, Dd, i, j, l
-      real*8 :: media_x, media_dx, dx, dx1, media_b, db
-      integer :: g, R, B
-      
-      dx = 0
-      dx1 = 0
-      db = 0
-      media_x = 0
-      media_dx = 0
-      media_db = 0
+      allocate(z(N), a(R))
 
-      allocate(z(N), u(R), a(R))
-      if(B==1) then
-	    allocate(q(R))
-      endif
-	
-      !il calcolo dell'errore avviene tramite il binned bootstrap poichè
-      !a priori non si può sapere qual è il tempo di decorellazione migliore
-      !da inserire nella simulazione, e per non sprecare tempo macchina,
-      !bisogna tenere conto di una possibile correlazione fra i dati
-	
-      Dd = 1e3			!dimensione dei blocchi	
-      nb = N/Dd			!numero dei blocchi
-      do l = 1, R		      !ciclo sui ricampionamenti
+      ! The calculation of the error is done through the binned bootstrap since
+      ! it is not possible to know a priori which is the best decorellation time
+      ! to insert in the simulation, and in order not to waste machine time,
+      ! a possible correlation between the data must be taken into account
+
+      nb = N/Db         ! number of blocks
+
+      do l = 1, R       ! loop of resampling
+
           do i = 1, nb
-		
-	        j = int(ran2()*N +1) !scelgo sito a caso
-	        do g= 1, Dd		 	
-	            z((i-1)*Dd+g) = x(mod(j+g-2,N)+1) !ricampiono a blocchi	
-	        enddo
-			
-	    enddo
-		
-	    !calcolo della media e della varianza dei ricampionamenti
-		
-	    a(l) = sum(z)/float(N*nvol)
-	    u(l) = (sum(z**2)/float(N) - (sum(z)/float(N))**2)/float(nvol)	
-	    if(B==1) then
-	        q(l) = (sum(z**4)/(sum(z**2)**2))*N
-	    endif	
+              j = int(ran2()*N +1) ! I choose site at random
+              do g = 1, Db
+                  z((i-1)*Db+g) = x(mod(j+g-2,N)+1) ! block's resampling
+              enddo
+          enddo
+
+          ! calculation of the mean or the variance of the resamplings
+
+          if (ics==0) then
+              a(l) = sum(z)/float(N*nvol)
+          endif
+
+          if (ics==1) then
+              a(l) = sum(z**2)/float(N) - (sum(z)/float(N))**2
+              a(l) = a(l)/float(nvol)
+          endif
+
       enddo
-	
-      media_dx = sum(u)/float(R)		!calcolo la media degli estimatori
-      media_x  = sum(a)/float(R)
-	
-      if(B==1) then
-          media_b = sum(q)/float(R)
-      endif
-	
+
+      media_x  = sum(a)/float(R)         ! mean
+      dx = 0
       do i=1, R
-          dx1 = dx1 + (u(i) - media_dx)**2 !calcolo scarto quadratico
-	    dx  = dx  + (a(i) - media_x )**2
-	    if(B==1) then
-	        db = db + (q(i) - media_b)**2
-	    endif
+          dx = dx + (a(i) - media_x )**2 ! standard deviation
       enddo
-	
-      dx  = sqrt(dx/float(R - 1))		!prendo l'errore sul campione
-      dx1 = sqrt(dx1/float(R - 1))		!perchè  sono stai effettuati
-      if(B==1) then				!R ricampionamenti
-	    db = sqrt(db/float(R - 1))	!quindi divido solo per R-1
-      endif					      !e non R(R-1)
-	
+
+      dx  = sqrt(dx/float(R - 1))
+      ! I take the error on the sample because we made R
+      ! resamples so I only divide by R-1 and not R(R-1)
+
       return
       end
 c============================================================================
