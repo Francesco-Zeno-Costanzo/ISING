@@ -1,7 +1,8 @@
 
-      parameter (nlatt=45, nvol=2*nlatt**2)
+      parameter (nlatt=50, nvol=2*nlatt**2)
       
       integer campo
+      real :: J_1, J_2, J_3
       
       common/reticolo/campo(nvol)
 
@@ -9,7 +10,7 @@
       common/vicinip/nn1(nvol),nn2(nvol),nn3(nvol)
 
       ! Secondi vicini
-      common/vicinis/nnn1(nvol),nnn2(nvol),nnn3(nvol)
+      common/vicinis/nnn1(nvol),nnn2(nvol),nnn3(nvol),
      &               nnn4(nvol),nnn5(nvol),nnn6(nvol)
 
       ! Terzi Vicini
