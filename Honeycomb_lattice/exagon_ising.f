@@ -10,14 +10,14 @@ C
 C     Facciamo un esempio per chiarire, supponendo L=5 e scegliando
 C     un sito a caso del reticolo (e.g. 17) si avrà la struttura:
 C
-C                25          27
-C          24          26          28
+C                   25          27
+C             24          26          28
 C
-C          15          17          19
-C                16          18
+C             15          17          19
+C                   16          18
 C          
-C                7           9
-C                      8
+C                   7           9
+C                         8
 C
 C     I primi   vicini di 17 sono: 16, 18 e 26
 C     I secondi vicini di 17 sono: 7, 9, 25, 27, 15 e 19
@@ -52,7 +52,7 @@ C===================================================================
       call ranstart
 
       open(1, file='init.txt',status='old')                 ! File coi parametri
-      open(2, file='data/data_J2_0.dat',status='unknown')   ! File coi risultati
+      open(2, file='data/data_L_10_J2_01.dat',status='unknown')   ! File coi risultati
 
       read(1,*) misure      ! Numero di misure
       read(1,*) i_dec       ! Updating fra una misura e l'altra
@@ -77,6 +77,7 @@ C===================================================================
       ! ci sono npassi blocchi, ciascuno lungo misure
 
       write(*,*) 'Taglia del reticolo: ',nlatt
+      write(*,*) 'J_1, J_2, J_3: ', J_1, J_2, J_3
 
       do k = 1, npassi  ! Ciclo sulle temperature
 
@@ -122,7 +123,7 @@ C============================================================================
 C Subroutine per condizioni al bordo per reticolo esagonale
 C============================================================================
       
-      subroutine bordi() 		
+      subroutine bordi()
 
       include "parameter.f"
 
@@ -225,7 +226,7 @@ C============================================================================
  
  
 C============================================================================
-C Inizializzazione del reticolo a caldo
+C Inizializzazione del reticolo
 C============================================================================
 
       subroutine init(i_start)
