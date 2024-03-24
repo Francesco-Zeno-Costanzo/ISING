@@ -4,10 +4,9 @@ C===============================================================================
 C     Il codice simula un modello di ising calssico su reticolo esagone con
 C     accoppiamenti fino a terzi vicini; l'hamiltoniana del sistema è:
 C
-C     H = - J_0*sum(s_i*s_j) + J_1*sum(s_i*s_j)  - J_2*sum(s_i*s_j) + bext*sum(s_i)
+C     H = - J_0*sum(s_i*s_j) - J_1*sum(s_i*s_j)  - J_2*sum(s_i*s_j) + bext*sum(s_i)
 C               primi vicini       secondi vicini      terzi vicini   campo esterno
 C
-C     Le costanti di accoppiamento sia assumono essere positive.
 C     Facciamo un esempio per chiarire, supponendo L=5 e scegliando
 C     un sito a caso del reticolo (e.g. 17) si avrà la struttura:
 C
@@ -23,9 +22,23 @@ C
 C     I primi   vicini di 17 sono: 16, 18 e 26
 C     I secondi vicini di 17 sono: 7, 9, 25, 27, 15 e 19
 C     I terzi   vicini di 17 sono: 8, 24 e 28
+C
+C     Per funzionare il codice neccessita di alcuni file:
+C     1) Un file chiamto randomseed, contente almeno un numero, necassario per
+C        l'utilizzo di ran2(). La subroutine ranfinish lo aggiornerà poi, quindi
+C        creato una volta non ce ne si deve più preoccupare
+C
+C     2) Un file chiamto init.txt contente i parametri della simulazione.
+C        dai commenti sottostanti si evince cosa siano queste varibili,
+C        sottolineamo però che i_start se:
+C        1) Vale 0 si ha partenza caldo (i.e. siti random)
+C        2) Vale 1 si ha partenza a freddo (i.e. tutti i siti = 1)
+C        ( scegliere se 0 o 1 può essere utile se si utilizza beta o T )
+C
 C===================================================================================
 
       include "parameter.f"
+
 C===================================================================
 C     File che permette di cambiare più facilmente i parametri della
 C     simulazione facendolo una sola volta piuttosto che diverse
@@ -39,7 +52,7 @@ C===================================================================
       call ranstart
 
       open(1, file='init.txt',status='old')                 ! File coi parametri
-      open(2, file='anti_dati/dati10.dat',status='unknown') ! File coi risultati
+      open(2, file='data/data_J2_0.dat',status='unknown')   ! File coi risultati
 
       read(1,*) misure      ! Numero di misure
       read(1,*) i_dec       ! Updating fra una misura e l'altra
@@ -50,13 +63,14 @@ C===================================================================
       read(1,*) J_1         ! Costante di accoppiamento primi   vicini
       read(1,*) J_2         ! Costante di accoppiamento secondi vicini
       read(1,*) J_3         ! Costante di accoppiamento terzi   vicini
+      read(1,*) i_start     ! Flag per decidere inizializzazione del reticolo
 
       write(2, *) misure    ! Scrivo quantità che seriviranno nell'analisi
       write(2, *) nvol
       write(2, *) npassi
 
       call bordi()          ! Condizioni di bordo continuo
-      call init()           ! Inizializzo il sistema
+      call init(i_start)    ! Inizializzo il sistema
 
       ! La scrittura avviene su un unico file che poi verrà letto a blocchi.
       ! Ogni blocco corrisponde ad una temperatura diversa
@@ -214,18 +228,23 @@ C============================================================================
 C Inizializzazione del reticolo a caldo
 C============================================================================
 
-      subroutine init()
+      subroutine init(i_start)
       include "parameter.f"
 
-      do i = 1, nvol           ! Iniazzializzazione del reticolo.
-          x = ran2()           ! Idealmente corrisponde ad avere T infinita
-          if(x<0.5) then       ! perchè il varole +-1 del sito è causale
-              campo(i) = 1
-          else
-              campo(i) = -1
-          endif
-      enddo
-
+      if (i_start == 0) then
+          do i = 1, nvol           ! Iniazzializzazione del reticolo.
+              x = ran2()           ! Idealmente corrisponde ad avere T infinita
+              if(x<0.5) then       ! perchè il varole +-1 del sito è causale
+                  campo(i) = 1
+              else
+                  campo(i) = -1
+              endif
+          enddo
+      elseif (i_start == 1) then
+          do i = 1, nvol           ! Iniazzializzazione del reticolo.
+              campo(i) = 1         ! Tutti gli spin a 1 come se fosse T = 0
+          enddo
+      endif
       return
       end
 
@@ -251,7 +270,7 @@ C============================================================================
 
               F2 = campo(nnn1(i)) + campo(nnn2(i)) + campo(nnn3(i)) +
      &             campo(nnn4(i)) + campo(nnn5(i)) + campo(nnn6(i))
-              F4 = F4 + J_2*F2
+              F4 = F4 - J_2*F2
 
           endif
           if (J_3 /= 0) then
@@ -261,7 +280,7 @@ C============================================================================
 
           endif
 
-          F = beta*(F4 + bext)       ! Aggiungo eventuale campo esterno
+          F = (F4 + bext)/beta       ! Aggiungo eventuale campo esterno
 
           p = exp(-2.0*campo(i)*F)   ! Probabilità di accettare la mossa
 
@@ -284,7 +303,7 @@ C============================================================================
 
       mag = 0                 ! Inizializzo la variabile
 
-      if (J_2 <= 0) then
+      if (J_2 >= 0) then
           do i = 1, nvol      ! Ciclo su tutto il reticolo
 
               mag = mag + campo(i)  ! e sommo ogni sito
@@ -323,7 +342,7 @@ C============================================================================
 
               F2 = campo(nnn1(i)) + campo(nnn2(i)) + campo(nnn3(i)) +
      &             campo(nnn4(i)) + campo(nnn5(i)) + campo(nnn6(i))
-              F4 = F4 + J_2*F2
+              F4 = F4 - J_2*F2
 
           endif
           if (J_3 /= 0) then
