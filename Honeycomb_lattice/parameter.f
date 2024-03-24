@@ -1,5 +1,5 @@
 
-      parameter (nlatt=50, nvol=2*nlatt**2)
+      parameter (nlatt=10, nvol=2*nlatt**2)
       
       integer campo
       real :: J_1, J_2, J_3
