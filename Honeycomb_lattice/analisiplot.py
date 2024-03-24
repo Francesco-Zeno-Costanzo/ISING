@@ -1,3 +1,7 @@
+"""
+Codice per l'analisi per ising "standard", i.e. solamente considerando
+accoppiamenti a primi vicini.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 
