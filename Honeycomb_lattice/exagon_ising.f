@@ -4,7 +4,7 @@ C===============================================================================
 C     Il codice simula un modello di ising calssico su reticolo esagone con
 C     accoppiamenti fino a terzi vicini; l'hamiltoniana del sistema è:
 C
-C     H = - J_0*sum(s_i*s_j) - J_1*sum(s_i*s_j)  - J_2*sum(s_i*s_j) + bext*sum(s_i)
+C     H = - J_1*sum(s_i*s_j) - J_2*sum(s_i*s_j)  - J_3*sum(s_i*s_j) + bext*sum(s_i)
 C               primi vicini       secondi vicini      terzi vicini   campo esterno
 C
 C     Facciamo un esempio per chiarire, supponendo L=5 e scegliando
@@ -34,6 +34,11 @@ C        sottolineamo però che i_start se:
 C        1) Vale 0 si ha partenza caldo (i.e. siti random)
 C        2) Vale 1 si ha partenza a freddo (i.e. tutti i siti = 1)
 C        ( scegliere se 0 o 1 può essere utile se si utilizza beta o T )
+C        Si può inoltre scegliere se usare la temperatura o beta a seconda
+C        del valore della flag i_b2t: -1 => temperatura 1 => beta
+C
+C     La variabile beta può quindi assumere il significato anche di temperatura
+C     ma per comodità lasciamo il nome beta
 C
 C===================================================================================
 
@@ -52,7 +57,7 @@ C===================================================================
       call ranstart
 
       open(1, file='init.txt',status='old')                 ! File coi parametri
-      open(2, file='data/data_L_10_J2_01.dat',status='unknown')   ! File coi risultati
+      open(2, file='data/data_L_50_J2_1.dat',status='unknown')   ! File coi risultati
 
       read(1,*) misure      ! Numero di misure
       read(1,*) i_dec       ! Updating fra una misura e l'altra
@@ -64,6 +69,7 @@ C===================================================================
       read(1,*) J_2         ! Costante di accoppiamento secondi vicini
       read(1,*) J_3         ! Costante di accoppiamento terzi   vicini
       read(1,*) i_start     ! Flag per decidere inizializzazione del reticolo
+      read(1,*) i_b2t       ! Flag per decidere se usare beta o temperatua
 
       write(2, *) misure    ! Scrivo quantità che seriviranno nell'analisi
       write(2, *) nvol
@@ -83,18 +89,18 @@ C===================================================================
 
           beta = bmin + (k-1)*(bmax-bmin)/float(npassi-1)
 
-          write(*, '(A1)', advance='no')  cr  ! Scrivo cr necessario per pulire la shell
+          write(*, '(A1)', advance='no')  cr   ! Scrivo cr necessario per pulire la shell
 
-          do i = 1, misure                    ! Ciclo sulle misure a fissa temperatura
+          do i = 1, misure                     ! Ciclo sulle misure a fissa temperatura
 
               do j = 1, i_dec
-                  call metropolis(beta)       ! Decorrela il sistema
+                  call metropolis(beta, i_b2t) ! Decorrela il sistema
               enddo
 
-              call magnetizzazione(mag)       ! Misurazione delle osservabili
+              call magnetizzazione(mag)        ! Misurazione delle osservabili
               call energia(ene)
 
-              write(2,*) abs(mag), ene        ! Salvataggio risultati
+              write(2,*) abs(mag), ene         ! Salvataggio risultati
 
           enddo
 
@@ -253,7 +259,7 @@ C============================================================================
 C Subroutine che implementa il metropolis
 C============================================================================
 
-      subroutine metropolis(beta)
+      subroutine metropolis(beta, i_b2t)
 
       include "parameter.f"
       
@@ -264,32 +270,33 @@ C============================================================================
           if (J_1 /= 0) then
 
               F1 = campo(nn1(i)) + campo(nn2(i)) + campo(nn3(i))
-              F4 = F4 - J_1*F1
+              F4 = F4 + J_1*F1
 
           endif
           if (J_2 /= 0) then
 
               F2 = campo(nnn1(i)) + campo(nnn2(i)) + campo(nnn3(i)) +
      &             campo(nnn4(i)) + campo(nnn5(i)) + campo(nnn6(i))
-              F4 = F4 - J_2*F2
+              F4 = F4 + J_2*F2
 
           endif
           if (J_3 /= 0) then
 
               F3 = campo(nnnn1(i)) + campo(nnnn2(i)) + campo(nnnn3(i))
-              F4 = F4 - J_3*F3
+              F4 = F4 + J_3*F3
 
           endif
 
-          F = (F4 + bext)/beta       ! Aggiungo eventuale campo esterno
+          ! i_b2t permette di passare da beta a temperatura
+          F = (F4 + bext)*(beta**i_b2t) ! Aggiungo eventuale campo esterno
 
-          p = exp(-2.0*campo(i)*F)   ! Probabilità di accettare la mossa
+          p = exp(-2.0*campo(i)*F)      ! Probabilità di accettare la mossa
 
-          x = ran2()                 ! Numero casuale per il test
+          x = ran2()                    ! Numero casuale per il test
 
-          if(x < p) then             ! Test di accettanza
-              campo(i) = -campo(i)   ! se F è negativo il test è
-          endif                      ! passato di default
+          if(x < p) then                ! Test di accettanza
+              campo(i) = -campo(i)      ! se F è negativo il test è
+          endif                         ! passato di default
       enddo
       return
       end
@@ -302,21 +309,14 @@ C============================================================================
 
       include "parameter.f"
 
-      mag = 0                 ! Inizializzo la variabile
+      mag = 0                   ! Inizializzo la variabile
 
-      if (J_2 >= 0) then
-          do i = 1, nvol      ! Ciclo su tutto il reticolo
+      do i = 1, nvol            ! Ciclo su tutto il reticolo
 
-              mag = mag + campo(i)  ! e sommo ogni sito
+          mag = mag + campo(i)  ! e sommo ogni sito
 
-          enddo
-      else 
-          do i = 1, nvol      ! Ciclo su tutto il reticolo
+      enddo
 
-              mag = mag + ((-1)**i)*campo(i)  !e sommo ogni sito
-
-          enddo
-      endif
       return
       end
 
@@ -336,20 +336,20 @@ C============================================================================
           if (J_1 /= 0) then
 
               F1 = campo(nn1(i)) + campo(nn2(i)) + campo(nn3(i))
-              F4 = F4 - J_1*F1
+              F4 = F4 + J_1*F1
 
           endif
           if (J_2 /= 0) then
 
               F2 = campo(nnn1(i)) + campo(nnn2(i)) + campo(nnn3(i)) +
      &             campo(nnn4(i)) + campo(nnn5(i)) + campo(nnn6(i))
-              F4 = F4 - J_2*F2
+              F4 = F4 + J_2*F2
 
           endif
           if (J_3 /= 0) then
 
               F3 = campo(nnnn1(i)) + campo(nnnn2(i)) + campo(nnnn3(i))
-              F4 = F4 - J_3*F3
+              F4 = F4 + J_3*F3
 
           endif
  
