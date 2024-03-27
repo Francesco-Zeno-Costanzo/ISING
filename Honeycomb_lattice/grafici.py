@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
        
-def plot(x, args, d_args, L, k, title, xlabel, ylabel):
+def plot(x, args, d_args, L, str_leg, k, title, xlabel, ylabel):
     """
     Funzione che esegue dei plot di dati
     su uno stesso grafico
@@ -15,6 +15,8 @@ def plot(x, args, d_args, L, k, title, xlabel, ylabel):
         lista degli array sulle y
     dargs : lista
         lista degli errori sulle y
+    str_leg : string
+        string of legend
     L : lista
         lista che la bella i dati, da mettere nella legenda
     k : int
@@ -36,7 +38,7 @@ def plot(x, args, d_args, L, k, title, xlabel, ylabel):
 
     for p, dp, i in zip(args, d_args, range(len(args))):
 
-        plt.errorbar(x, p, dp, fmt='.', color=colors[i], label=f'L={L[i]}')
+        plt.errorbar(x, p, dp, fmt='.', linestyle='--', color=colors[i], label=f'{str_leg}={L[i]}')
                    
     plt.legend(loc='best')
 
