@@ -11,12 +11,13 @@
 
       !apro file da cui leggere i dati da analizzare e file su
       !cui scrivere i risultati con relativi errori
-      open(unit=0, file="data/data_L_10_J2_01.dat", status="old")
-      open(unit=2, file='dataplot/data_L_10_J2_01.dat',status='unknown')
+      open(unit=0, file="data/data_L_50_J2_1.dat", status="old")
+      open(unit=2, file='dataplot/data_L_50_J2_1.dat',
+     &      status='unknown')
 
       R  = 100              ! Numero di ricampionamenti
       DB = 1000             ! Dimesione blocchi
-      
+
       read(0, *) N          ! Leggo i primi valori che sono
       read(0, *) nvol       ! necessari per l'analisi
       read(0, *) npassi
@@ -39,16 +40,14 @@
 
           cb = (sum(Mag**4)/(sum(Mag**2)**2))*N !cumulante di binder
 
-          !calcolo errore con bootstrap, se l'ultimo parametro è 1
-          !viene calcolato anche l'errore sul cumulate di binder
-
           call bootstrap(N, Ene, daver_e, 0, R, nvol, DB)
           call bootstrap(N, Mag, daver_m, 0, R, nvol, DB)
           call bootstrap(N, Ene, daver_c, 1, R, nvol, DB)
           call bootstrap(N, Mag, daver_x, 1, R, nvol, DB)
+          call bootstrap(N, Mag, dcb    , 2, R, nvol, DB)
 
-          write(2,*) aver_e, aver_m, aver_c, aver_x,  !salvo su file
-     &             daver_e, daver_m, daver_c, daver_x
+          write(2,*) aver_e, aver_m, aver_c, aver_x, cb,  !salvo su file
+     &             daver_e, daver_m, daver_c, daver_x, dcb
 
       enddo
 
@@ -116,6 +115,10 @@ C=============================================================================
           if (ics==1) then
               a(l) = sum(z**2)/float(N) - (sum(z)/float(N))**2
               a(l) = a(l)/float(nvol)
+          endif
+
+          if (ics==2) then
+              a(l) = (sum(z**4)/(sum(z**2)**2))*N
           endif
 
       enddo
